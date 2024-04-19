@@ -16,7 +16,7 @@ app:
     requests:
       memory: "96M"
       cpu: "0.05"
-  replicaCount: 2
+  replicaCount: 1
   command: [ "cd src && python manage.py migrate && gunicorn core.wsgi:application --bind 0.0.0.0:8000" ]
   enabled: true
 
