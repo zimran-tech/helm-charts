@@ -1,0 +1,47 @@
+{{- if .Values.job.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ .Release.Name }}-collect-static
+  namespace: prosperi-services-staging
+  labels:
+    app: {{ .Release.Name }}-job
+    tenant: prosperi
+    env: {{ .Values.environment }}
+spec:
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-job
+    spec:
+      serviceAccountName: {{ .Values.serviceAccountName }} # should be in the same namespace as the deployment
+      restartPolicy: Never
+      volumes:
+        - name: spc-volume
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: {{ .Release.Name }}-spc
+      containers:
+        - name: {{ .Release.Name }}-collect-static
+          image: {{ .Values.image }}
+          command: [ "sh", "-c" ]
+          args: {{ .Values.job.command }}
+          resources:
+            requests:
+              memory: {{ .Values.job.resources.requests.memory }}
+              cpu: {{ .Values.job.resources.requests.cpu }}
+          volumeMounts:
+            - name: spc-volume
+              mountPath: "/mnt/secrets-store"
+              readOnly: true
+          env:
+            {{- range $secret := .Values.secrets }}
+            - name: {{ $secret.name | upper }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $.Release.Name }}-secret
+                  key: {{ $secret.name }}
+            {{- end }}
+{{- end }}

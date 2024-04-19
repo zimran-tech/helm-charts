@@ -1,0 +1,50 @@
+{{- if .Values.consumer.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-consumer-deploy
+  namespace: prosperi-services-staging
+  labels:
+    app: {{ .Release.Name }}-consumer
+    tenant: prosperi
+    env: {{ .Values.environment }}
+spec:
+  replicas: {{ .Values.consumer.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-consumer
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-consumer
+    spec:
+      serviceAccountName: {{ .Values.serviceAccountName }} # should be in the same namespace as the deployment
+      volumes:
+        - name: spc-volume
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: {{ .Release.Name }}-spc
+      containers:
+        - name: {{ .Release.Name }}-consumer
+          image: {{ .Values.image }}
+          command: [ "/bin/sh", "-c" ]
+          args: {{ .Values.consumer.command }}
+          resources:
+            requests:
+              memory: {{ .Values.consumer.resources.requests.memory }}
+              cpu: {{ .Values.consumer.resources.requests.cpu }}
+          volumeMounts:
+            - name: spc-volume
+              mountPath: "/mnt/secrets-store"
+              readOnly: true
+          env:
+            {{- range $secret := .Values.secrets }}
+            - name: {{ $secret.name | upper }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $.Release.Name }}-secret
+                  key: {{ $secret.name }}
+            {{- end }}
+{{ end }}

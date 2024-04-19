@@ -1,0 +1,52 @@
+image: 346486810583.dkr.ecr.us-east-1.amazonaws.com/offers:8647536024
+
+environment: staging
+
+port: 2003
+targetPort: 8000
+
+awsSecretName: prosperi/staging/offers
+
+certificateArn: arn:aws:acm:us-east-1:346486810583:certificate/31bd3160-a3a2-44d2-805a-8bf241eee9f4
+
+serviceAccountName: prosperi-services-staging-sa
+
+app:
+  resources:
+    requests:
+      memory: "96M"
+      cpu: "0.05"
+  replicaCount: 2
+  command: [ "cd src && python manage.py migrate && gunicorn core.wsgi:application --bind 0.0.0.0:8000" ]
+  enabled: true
+
+consumer:
+  resources:
+    requests:
+      memory: "96M"
+      cpu: "0.05"
+  replicaCount: 1
+  command: [ "cd src && python -m consumer" ]
+  enabled: false
+
+job:
+  resources:
+    requests:
+      memory: "96M"
+      cpu: "0.05"
+  command: [ "cd src && python manage.py collectstatic --noinput" ]
+  enabled: true
+
+secrets:
+  - name: cors_allow_all_origins
+  - name: csrf_trusted_origins
+  - name: database_url
+  - name: environment
+  - name: rabbitmq_url
+  - name: redis_url
+  - name: s3_access_key_id
+  - name: s3_secret_access_key
+  - name: s3_storage_bucket_name
+  - name: secret_key
+  - name: sentry_dsn
+  - name: use_s3
