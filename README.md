@@ -13,7 +13,7 @@ prosperi-charts` to see the charts.
 
 To install the `service` chart:
 
-    helm install my-service prosperi-charts/service
+    helm install my-service prosperi-charts/app
 
 To uninstall the chart:
 
