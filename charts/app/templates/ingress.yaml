@@ -4,12 +4,12 @@ metadata:
   namespace: {{ .Release.namespace }}
   name: {{ .Release.Name }}-ingress
   annotations:
-    kubernetes.io/ingress.class: alb
-    alb.ingress.kubernetes.io/scheme: internet-facing
-    alb.ingress.kubernetes.io/target-type: ip
-    alb.ingress.kubernetes.io/certificate-arn: {{ .Values.certificateArn }}
+    kubernetes.io/ingress.class: {{ .Values.ingress.class }}
+    alb.ingress.kubernetes.io/scheme: {{ .Values.ingress.scheme }}
+    alb.ingress.kubernetes.io/target-type: {{ .Values.ingress.targetType }}
+    alb.ingress.kubernetes.io/certificate-arn: {{ .Values.ingress.certificateArn }}
 spec:
-  ingressClassName: alb
+  ingressClassName: {{ .Values.ingress.class }}
   rules:
     - http:
         paths:

@@ -26,13 +26,22 @@ spec:
             readOnly: true
             volumeAttributes:
               secretProviderClass: {{ .Release.Name }}-spc
+      {{- if .Values.dbMigrationJob.enabled }}
+      initContainers:
+        - name: migrations-waiting-init
+          image: ghcr.io/groundnuty/k8s-wait-for:v2.0
+          imagePullPolicy: IfNotPresent
+          args:
+            - "job"
+            - {{ $.Release.Name }}-migrate-job
+      {{- end }}
       containers:
         - name: {{ .Release.Name }}-app
           image: {{ .Values.image }}
           ports:
             - containerPort: {{ .Values.targetPort }}
           command: [ "/bin/sh", "-c" ]
-          args: {{ .Values.app.command }}
+          args: {{ .Values.app.args }}
           resources:
             requests:
               memory: {{ .Values.app.resources.requests.memory }}
@@ -42,7 +51,7 @@ spec:
               mountPath: "/mnt/secrets-store"
               readOnly: true
           env:
-            {{- range $secret := .Values.secrets }}
+            {{- range $secret := .Values.secrets.envs }}
             - name: {{ $secret.name | upper }}
               valueFrom:
                 secretKeyRef:
