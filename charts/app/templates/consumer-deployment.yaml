@@ -26,14 +26,17 @@ spec:
             readOnly: true
             volumeAttributes:
               secretProviderClass: {{ .Release.Name }}-spc
-      {{- if .Values.dbMigrationJob.enabled }}
+      {{- $dbMigrationJob := index .Values.jobs 0 }}
+      {{- if $dbMigrationJob }}
+        {{- if $dbMigrationJob.enabled }}
       initContainers:
         - name: migrations-waiting-init
           image: ghcr.io/groundnuty/k8s-wait-for:v2.0
           imagePullPolicy: IfNotPresent
           args:
             - "job"
-            - {{ $.Release.Name }}-migrate-job
+            - "{{ $.Release.Name }}-{{ $dbMigrationJob.name }}"
+        {{- end }}
       {{- end }}
       containers:
         - name: {{ .Release.Name }}-consumer

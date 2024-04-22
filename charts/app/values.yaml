@@ -19,7 +19,7 @@ app:
       memory: "96M"
       cpu: "0.05"
   replicaCount: 1
-  args: [ "gunicorn", "src.core.wsgi:application", "--bind", "0.0.0.0:8000" ]
+  args: [ "cd", "src", "&&", "gunicorn", "core.wsgi:application", "--bind", "0.0.0.0:8000" ]
   enabled: true
 
 consumer:
@@ -28,20 +28,28 @@ consumer:
       memory: "96M"
       cpu: "0.05"
   replicaCount: 1
-  args: [ "python3", "-m", "src.consumer" ]
+  args: [ "cd", "src", "&&", "python3", "-m", "consumer" ]
   enabled: false
 
-dbMigrationJob:
-  enabled: true
-  args: [ "python3", "src/manage.py", "migrate" ]
-
-collectStaticJob:
-  resources:
-    requests:
-      memory: "96M"
-      cpu: "0.05"
-  args: [ "python3", "src/manage.py", "collectstatic", "--noinput" ]
-  enabled: true
+jobs:
+  - name: db-migration-job
+    ttlSecondsAfterFinished: 100
+    restartPolicy: Never
+    enabled: false
+    resources:
+      requests:
+        memory: "96M"
+        cpu: "0.05"
+    args: [ "python3", "src/manage.py", "migrate" ]
+  - name: collect-static-job
+    ttlSecondsAfterFinished: 10
+    restartPolicy: Never
+    enabled: false
+    resources:
+      requests:
+        memory: "96M"
+        cpu: "0.05"
+    args: [ "python3", "src/manage.py", "collectstatic", "--noinput" ]
 
 secrets:
   awsSecretName: prosperi/ENVIRONMENT/SECRET_NAME # specify secret name explicitly
