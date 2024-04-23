@@ -1,13 +1,17 @@
-image: 346486810583.dkr.ecr.us-east-1.amazonaws.com/offers:8647536024
+image: AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/ECR_REPO_NAME:TAG # specify image explicitly
 
 environment: staging
 
-port: 2003
+port: 2000 # specify port explicitly
 targetPort: 8000
 
-awsSecretName: prosperi/staging/offers
-
-certificateArn: arn:aws:acm:us-east-1:346486810583:certificate/31bd3160-a3a2-44d2-805a-8bf241eee9f4
+ingress:
+  annotations: {
+    kubernetes.io/ingress.class: alb,
+    alb.ingress.kubernetes.io/scheme: internet-facing,
+    alb.ingress.kubernetes.io/target-type: ip,
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-1:346486810583:certificate/31bd3160-a3a2-44d2-805a-8bf241eee9f4,
+  }
 
 serviceAccountName: prosperi-services-staging-sa
 
@@ -17,7 +21,7 @@ app:
       memory: "96M"
       cpu: "0.05"
   replicaCount: 1
-  command: [ "cd src && python manage.py migrate && gunicorn core.wsgi:application --bind 0.0.0.0:8000" ]
+  args: [ "cd", "src", "&&", "gunicorn", "core.wsgi:application", "--bind", "0.0.0.0:8000" ]
   enabled: true
 
 consumer:
@@ -26,27 +30,40 @@ consumer:
       memory: "96M"
       cpu: "0.05"
   replicaCount: 1
-  command: [ "cd src && python -m consumer" ]
+  args: [ "cd", "src", "&&", "python3", "-m", "consumer" ]
   enabled: false
 
-job:
-  resources:
-    requests:
-      memory: "96M"
-      cpu: "0.05"
-  command: [ "cd src && python manage.py collectstatic --noinput" ]
-  enabled: true
+jobs:
+#  - name: db-migration-job
+#    ttlSecondsAfterFinished: 100
+#    restartPolicy: Never
+#    resources:
+#      requests:
+#        memory: "96M"
+#        cpu: "0.05"
+#    args: [ "python3", "src/manage.py", "migrate" ]
+#  - name: collect-static-job
+#    ttlSecondsAfterFinished: 10
+#    restartPolicy: Never
+#    resources:
+#      requests:
+#        memory: "96M"
+#        cpu: "0.05"
+#    args: [ "python3", "src/manage.py", "collectstatic", "--noinput" ]
+
+initContainers:
+  - name: migrations-waiting-init
+    image: ghcr.io/groundnuty/k8s-wait-for:v2.0
+    imagePullPolicy: IfNotPresent
+    args:
+      - "job"
+      - "{{ $.Release.Name }}-{{ $dbMigrationJob.name }}"
 
 secrets:
-  - name: cors_allow_all_origins
-  - name: csrf_trusted_origins
-  - name: database_url
-  - name: environment
-  - name: rabbitmq_url
-  - name: redis_url
-  - name: s3_access_key_id
-  - name: s3_secret_access_key
-  - name: s3_storage_bucket_name
-  - name: secret_key
-  - name: sentry_dsn
-  - name: use_s3
+  awsSecretName: prosperi/ENVIRONMENT/SECRET_NAME # specify secret name explicitly
+  envs:
+    - name: database_url
+    - name: environment
+    - name: rabbitmq_url
+    - name: redis_url
+    - name: sentry_dsn
