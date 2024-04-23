@@ -29,6 +29,7 @@ consumer:
   command: [ "cd src && python -m consumer" ]
   enabled: false
 
+<<<<<<< Updated upstream
 job:
   resources:
     requests:
@@ -36,6 +37,33 @@ job:
       cpu: "0.05"
   command: [ "cd src && python manage.py collectstatic --noinput" ]
   enabled: true
+=======
+jobs:
+#  - name: db-migration-job
+#    ttlSecondsAfterFinished: 100
+#    restartPolicy: Never
+#    resources:
+#      requests:
+#        memory: "96M"
+#        cpu: "0.05"
+#    args: [ "python3", "src/manage.py", "migrate" ]
+#  - name: collect-static-job
+#    ttlSecondsAfterFinished: 10
+#    restartPolicy: Never
+#    resources:
+#      requests:
+#        memory: "96M"
+#        cpu: "0.05"
+#    args: [ "python3", "src/manage.py", "collectstatic", "--noinput" ]
+
+initContainers:
+#  - name: migrations-waiting-init
+#    image: ghcr.io/groundnuty/k8s-wait-for:v2.0
+#    imagePullPolicy: IfNotPresent
+#    args:
+#      - "job"
+#      - "{{ $.Release.Name }}-{{ $dbMigrationJob.name }}"
+>>>>>>> Stashed changes
 
 secrets:
   - name: cors_allow_all_origins
