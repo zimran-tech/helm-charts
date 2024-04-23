@@ -1,5 +1,4 @@
 {{- range $job := .Values.jobs }}
-{{- if $job.enabled }}
 ---
 apiVersion: batch/v1
 kind: Job
@@ -47,5 +46,4 @@ spec:
                   name: {{ $.Release.Name }}-secret
                   key: {{ $secret.name }}
             {{- end }}
-{{- end }}
 {{- end }}
