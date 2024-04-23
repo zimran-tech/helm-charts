@@ -5,11 +5,19 @@ environment: staging
 port: 2000 # specify port explicitly
 targetPort: 8000
 
+#ingress:
+#  class: alb
+#  scheme: internet-facing
+#  targetType: ip
+#  certificateArn: arn:aws:acm:us-east-1:346486810583:certificate/31bd3160-a3a2-44d2-805a-8bf241eee9f4
+
 ingress:
-  class: alb
-  scheme: internet-facing
-  targetType: ip
-  certificateArn: arn:aws:acm:us-east-1:346486810583:certificate/31bd3160-a3a2-44d2-805a-8bf241eee9f4
+  annotations: {
+    kubernetes.io/ingress.class: alb,
+    alb.ingress.kubernetes.io/scheme: internet-facing,
+    alb.ingress.kubernetes.io/target-type: ip,
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-1:346486810583:certificate/31bd3160-a3a2-44d2-805a-8bf241eee9f4,
+  }
 
 serviceAccountName: prosperi-services-staging-sa
 
