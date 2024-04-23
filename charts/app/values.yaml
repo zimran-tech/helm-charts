@@ -52,12 +52,12 @@ jobs:
 #    args: [ "python3", "src/manage.py", "collectstatic", "--noinput" ]
 
 initContainers:
-  - name: migrations-waiting-init
-    image: ghcr.io/groundnuty/k8s-wait-for:v2.0
-    imagePullPolicy: IfNotPresent
-    args:
-      - "job"
-      - "{{ $.Release.Name }}-{{ $dbMigrationJob.name }}"
+#  - name: migrations-waiting-init
+#    image: ghcr.io/groundnuty/k8s-wait-for:v2.0
+#    imagePullPolicy: IfNotPresent
+#    args:
+#      - "job"
+#      - "{{ $.Release.Name }}-{{ $dbMigrationJob.name }}"
 
 secrets:
   awsSecretName: prosperi/ENVIRONMENT/SECRET_NAME # specify secret name explicitly
