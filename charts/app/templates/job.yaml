@@ -1,0 +1,49 @@
+{{- range $job := .Values.jobs }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ $.Release.Name }}-{{ $job.name }}
+  namespace: {{ $.Release.Namespace }}
+  labels:
+    app: {{ $.Release.Name }}-{{ $job.name }}
+    tenant: prosperi
+    env: {{ $.Values.environment }}
+spec:
+  ttlSecondsAfterFinished: {{ $job.ttlSecondsAfterFinished }}
+  template:
+    metadata:
+      labels:
+        app: {{ $.Release.Name }}-{{ $job.name }}
+    spec:
+      serviceAccountName: {{ $.Values.serviceAccountName }}
+      restartPolicy: {{ $job.restartPolicy }}
+      volumes:
+        - name: spc-volume
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: {{ $.Release.Name }}-spc
+      containers:
+        - name: {{ $.Release.Name }}-{{ $job.name }}
+          image: {{ $.Values.image }}
+          command: [ "/bin/sh", "-c" ]
+          args: {{ $job.args }}
+          resources:
+            requests:
+              memory: {{ $job.resources.requests.memory }}
+              cpu: {{ $job.resources.requests.cpu }}
+          volumeMounts:
+            - name: spc-volume
+              mountPath: "/mnt/secrets-store"
+              readOnly: true
+          env:
+            {{- range $secret := $.Values.secrets.envs }}
+            - name: {{ $secret.name | upper }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $.Release.Name }}-secret
+                  key: {{ $secret.name }}
+            {{- end }}
+{{- end }}
