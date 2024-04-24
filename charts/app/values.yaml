@@ -1,4 +1,4 @@
-image: AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/ECR_REPO_NAME:TAG # specify image explicitly
+image: IMAGE # specify image explicitly
 
 environment: staging
 
@@ -11,13 +11,13 @@ ingress:
     kubernetes.io/ingress.class: alb,
     alb.ingress.kubernetes.io/scheme: internet-facing,
     alb.ingress.kubernetes.io/target-type: ip,
-    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-1:346486810583:certificate/31bd3160-a3a2-44d2-805a-8bf241eee9f4,
+    alb.ingress.kubernetes.io/certificate-arn: CERTIFICATE_ARN,
   }
 
 serviceAccount:
-  name: prosperi-services-staging-sa
+  name: SERVICE_ACCOUNT_NAME
   annotations: {
-    roleArn: arn:aws:iam::346486810583:role/prosperi-services-staging-role
+    roleArn: ROLE_ARN
   }
 
 
@@ -66,7 +66,7 @@ initContainers:
 #      - "{{ $.Release.Name }}-{{ $dbMigrationJob.name }}"
 
 secrets:
-  awsSecretName: prosperi/ENVIRONMENT/SECRET_NAME # specify secret name explicitly
+  awsSecretName: APP/ENVIRONMENT/SECRET_NAME # specify secret name explicitly
   envs:
     - name: DATABASE_URL
     - name: ENVIRONMENT
