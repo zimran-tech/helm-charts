@@ -62,8 +62,8 @@ initContainers:
 secrets:
   awsSecretName: prosperi/ENVIRONMENT/SECRET_NAME # specify secret name explicitly
   envs:
-    - name: database_url
-    - name: environment
-    - name: rabbitmq_url
-    - name: redis_url
-    - name: sentry_dsn
+    - name: DATABASE_URL
+    - name: ENVIRONMENT
+    - name: RABBITMQ_URL
+    - name: REDIS_URL
+    - name: SENTRY_DSN

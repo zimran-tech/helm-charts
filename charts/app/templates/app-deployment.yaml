@@ -52,7 +52,7 @@ spec:
               readOnly: true
           env:
             {{- range $secret := .Values.secrets.envs }}
-            - name: {{ $secret.name | upper }}
+            - name: {{ $secret.name }}
               valueFrom:
                 secretKeyRef:
                   name: {{ $.Release.Name }}-secret
