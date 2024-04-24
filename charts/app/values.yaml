@@ -6,6 +6,7 @@ port: 2000 # specify port explicitly
 targetPort: 8000
 
 ingress:
+  class: alb
   annotations: {
     kubernetes.io/ingress.class: alb,
     alb.ingress.kubernetes.io/scheme: internet-facing,
@@ -15,7 +16,9 @@ ingress:
 
 serviceAccount:
   name: prosperi-services-staging-sa
-  roleArn: arn:aws:iam::346486810583:role/prosperi-services-staging-role
+  annotations: {
+    roleArn: arn:aws:iam::346486810583:role/prosperi-services-staging-role
+  }
 
 
 app:
