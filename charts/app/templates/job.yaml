@@ -16,7 +16,7 @@ spec:
       labels:
         app: {{ $.Release.Name }}-{{ $job.name }}
     spec:
-      serviceAccountName: {{ $.Values.serviceAccountName }}
+      serviceAccountName: {{ $.Values.serviceAccount.name }}
       restartPolicy: {{ $job.restartPolicy }}
       volumes:
         - name: spc-volume
@@ -28,7 +28,10 @@ spec:
       containers:
         - name: {{ $.Release.Name }}-{{ $job.name }}
           image: {{ $.Values.image }}
-          command: [ "/bin/sh", "-c" ]
+          command:
+            {{- range .Values.consumer.command }}
+            - {{ . }}
+            {{- end }}
           args: {{ $job.args }}
           resources:
             requests:

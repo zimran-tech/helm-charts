@@ -18,7 +18,7 @@ spec:
       labels:
         app: {{ .Release.Name }}-app
     spec:
-      serviceAccountName: {{ .Values.serviceAccountName }} # should be in the same namespace as the deployment
+      serviceAccountName: {{ .Values.serviceAccount.name }} # should be in the same namespace as the deployment
       volumes:
         - name: {{ .Release.Name }}-spc-volume
           csi:
@@ -40,7 +40,10 @@ spec:
           image: {{ .Values.image }}
           ports:
             - containerPort: {{ .Values.targetPort }}
-          command: [ "/bin/sh", "-c" ]
+          command:
+            {{- range .Values.consumer.command }}
+            - {{ . }}
+            {{- end }}
           args: {{ .Values.app.args }}
           resources:
             requests:

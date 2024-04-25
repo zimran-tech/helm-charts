@@ -1,4 +1,4 @@
-image: AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/ECR_REPO_NAME:TAG # specify image explicitly
+image: IMAGE # specify image explicitly
 
 environment: staging
 
@@ -6,14 +6,20 @@ port: 2000 # specify port explicitly
 targetPort: 8000
 
 ingress:
+  class: alb
   annotations: {
     kubernetes.io/ingress.class: alb,
     alb.ingress.kubernetes.io/scheme: internet-facing,
     alb.ingress.kubernetes.io/target-type: ip,
-    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-1:346486810583:certificate/31bd3160-a3a2-44d2-805a-8bf241eee9f4,
+    alb.ingress.kubernetes.io/certificate-arn: CERTIFICATE_ARN,
   }
 
-serviceAccountName: prosperi-services-staging-sa
+serviceAccount:
+  name: SERVICE_ACCOUNT_NAME
+  annotations: {
+    roleArn: ROLE_ARN
+  }
+
 
 app:
   resources:
@@ -21,6 +27,7 @@ app:
       memory: "96M"
       cpu: "0.05"
   replicaCount: 1
+  command: [ "/bin/sh", "-c"]
   args: [ "cd", "src", "&&", "gunicorn", "core.wsgi:application", "--bind", "0.0.0.0:8000" ]
   enabled: true
 
@@ -30,6 +37,7 @@ consumer:
       memory: "96M"
       cpu: "0.05"
   replicaCount: 1
+  command: [ "/bin/sh", "-c"]
   args: [ "cd", "src", "&&", "python3", "-m", "consumer" ]
   enabled: false
 
@@ -41,6 +49,7 @@ jobs:
 #      requests:
 #        memory: "96M"
 #        cpu: "0.05"
+#  command: [ "/bin/sh", "-c"]
 #    args: [ "python3", "src/manage.py", "migrate" ]
 #  - name: collect-static-job
 #    ttlSecondsAfterFinished: 10
@@ -60,7 +69,7 @@ initContainers:
 #      - "{{ $.Release.Name }}-{{ $dbMigrationJob.name }}"
 
 secrets:
-  awsSecretName: prosperi/ENVIRONMENT/SECRET_NAME # specify secret name explicitly
+  awsSecretName: APP/ENVIRONMENT/SECRET_NAME # specify secret name explicitly
   envs:
     - name: DATABASE_URL
     - name: ENVIRONMENT
