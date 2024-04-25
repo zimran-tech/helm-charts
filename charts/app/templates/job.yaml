@@ -28,7 +28,10 @@ spec:
       containers:
         - name: {{ $.Release.Name }}-{{ $job.name }}
           image: {{ $.Values.image }}
-          command: [ "/bin/sh", "-c" ]
+          command:
+            {{- range .Values.consumer.command }}
+            - {{ . }}
+            {{- end }}
           args: {{ $job.args }}
           resources:
             requests:

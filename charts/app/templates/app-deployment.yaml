@@ -40,7 +40,10 @@ spec:
           image: {{ .Values.image }}
           ports:
             - containerPort: {{ .Values.targetPort }}
-          command: [ "/bin/sh", "-c" ]
+          command:
+            {{- range .Values.consumer.command }}
+            - {{ . }}
+            {{- end }}
           args: {{ .Values.app.args }}
           resources:
             requests:
