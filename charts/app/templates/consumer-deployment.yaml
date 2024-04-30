@@ -36,11 +36,14 @@ spec:
               secretProviderClass: {{ $.Release.Name }}-spc
       {{- if $.Values.initContainers }}
       initContainers:
-        {{- range $initContainer := $consumer.initContainers }}
+        {{- range $initContainer := $.Values.initContainers }}
         - name: {{ $initContainer.name }}
           image: {{ $initContainer.image }}
           imagePullPolicy: {{ $initContainer.imagePullPolicy }}
-          args: {{ $initContainer.args }}
+          args:
+            {{- range $arg := $initContainer.args }}
+            - {{ $arg }}
+            {{- end }}
         {{- end }}
       {{- end }}
       containers:
