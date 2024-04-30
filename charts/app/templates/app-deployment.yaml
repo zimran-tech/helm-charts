@@ -23,8 +23,11 @@ spec:
         env: {{ .Values.environment }}
         external-nlb: {{ .Values.externalNlb }}
     spec:
-      {{- with .Values.nodeSelector }}
       nodeSelector:
+      {{- with .Values.nodeSelector }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.app.nodeSelector }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ .Values.serviceAccount.name }} # should be in the same namespace as the deployment

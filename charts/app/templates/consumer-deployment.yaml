@@ -7,7 +7,7 @@ metadata:
   namespace: {{ $.Release.Namespace }}
   labels:
     app: {{ $.Release.Name }}-consumer
-    tenant: {{ .Values.tenant }}
+    tenant: {{ $.Values.tenant }}
     env: {{ $.Values.environment }}
 spec:
   replicas: {{ $consumer.replicaCount }}
@@ -19,8 +19,11 @@ spec:
       labels:
         app: {{ $.Release.Name }}-{{ $consumer.name }}
     spec:
-      {{- with $.Values.nodeSelector }}
       nodeSelector:
+      {{- with $.Values.nodeSelector }}
+          {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $consumer.nodeSelector }}
           {{- toYaml . | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ $.Values.serviceAccount.name }} # should be in the same namespace as the deployment
