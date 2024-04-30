@@ -32,9 +32,9 @@ spec:
             readOnly: true
             volumeAttributes:
               secretProviderClass: {{ .Release.Name }}-spc
-      {{- if .Values.consumer.initContainers }}
+      {{- if .Values.initContainers }}
       initContainers:
-        {{- range $initContainer := .Values.consumer.initContainers }}
+        {{- range $initContainer := .Values.initContainers }}
         - name: {{ $initContainer.name }}
           image: {{ $initContainer.image }}
           imagePullPolicy: {{ $initContainer.imagePullPolicy }}
@@ -48,7 +48,7 @@ spec:
             - containerPort: {{ .Values.targetPort }}
               name: {{ .Release.Name }}-app-port
           command:
-            {{- range .Values.consumer.command }}
+            {{- range .Values.app.command }}
             - {{ . }}
             {{- end }}
           args: {{ .Values.app.args }}
