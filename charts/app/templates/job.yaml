@@ -16,8 +16,11 @@ spec:
       labels:
         app: {{ $.Release.Name }}-{{ $job.name }}
     spec:
-      {{- with $.Values.nodeSelector }}
       nodeSelector:
+      {{- with $.Values.nodeSelector }}
+          {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $job.nodeSelector }}
           {{- toYaml . | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ $.Values.serviceAccount.name }}

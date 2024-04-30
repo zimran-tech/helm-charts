@@ -40,16 +40,25 @@ app:
   command: [ "/bin/sh", "-c" ]
   args: [ "cd", "src", "&&", "gunicorn", "core.wsgi:application", "--bind", "0.0.0.0:8000" ]
   enabled: true
+  #    nodeSelector: {
+  #      app_node_group: prosperi-staging
+  #    }
 
-consumer:
-  resources:
-    requests:
-      memory: "96M"
-      cpu: "0.05"
-  replicaCount: 1
-  command: [ "/bin/sh", "-c" ]
-  args: [ "cd", "src", "&&", "python3", "-m", "consumer" ]
-  enabled: false
+
+consumers:
+#  - name: consumer
+#    resources:
+#      requests:
+#        memory: "96M"
+#        cpu: "0.05"
+#    replicaCount: 1
+#    command: [ "/bin/sh", "-c"]
+#    args: [ "cd", "src", "&&", "python3", "-m", "consumer" ]
+#    nodeSelector: {
+#      app_node_group: prosperi-staging
+#    }
+
+
 
 jobs:
 #  - name: db-migration-job
@@ -69,6 +78,9 @@ jobs:
 #        memory: "96M"
 #        cpu: "0.05"
 #    args: [ "python3", "src/manage.py", "collectstatic", "--noinput" ]
+#    nodeSelector: {
+#      app_node_group: prosperi-staging
+#    }
 
 initContainers:
 #  - name: migrations-waiting-init
