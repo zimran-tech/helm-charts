@@ -7,7 +7,7 @@ metadata:
   namespace: {{ $.Release.Namespace }}
   labels:
     app: {{ $.Release.Name }}-{{ $job.name }}
-    tenant: prosperi
+    tenant: {{ .Values.tenant }}
     env: {{ $.Values.environment }}
 spec:
   ttlSecondsAfterFinished: {{ $job.ttlSecondsAfterFinished }}
@@ -16,8 +16,10 @@ spec:
       labels:
         app: {{ $.Release.Name }}-{{ $job.name }}
     spec:
+      {{- with .Values.nodeSelector }}
       nodeSelector:
-        app_node_group: {{ .Values.nodeGroup }}
+          {{- toYaml . | nindent 8 }}
+      {{- end }}
       serviceAccountName: {{ $.Values.serviceAccount.name }}
       restartPolicy: {{ $job.restartPolicy }}
       volumes:
