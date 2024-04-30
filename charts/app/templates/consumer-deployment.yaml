@@ -1,34 +1,42 @@
-{{- if .Values.consumer.enabled }}
+{{- range $consumer := .Values.consumers }}
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Release.Name }}-consumer-deploy
-  namespace: {{ .Release.Namespace }}
+  name: {{ $.Release.Name }}-{{ $consumer.name }}-deploy
+  namespace: {{ $.Release.Namespace }}
   labels:
-    app: {{ .Release.Name }}-consumer
-    tenant: prosperi
-    env: {{ .Values.environment }}
+    app: {{ $.Release.Name }}-consumer
+    tenant: {{ $.Values.tenant }}
+    env: {{ $.Values.environment }}
 spec:
-  replicas: {{ .Values.consumer.replicaCount }}
+  replicas: {{ $consumer.replicaCount }}
   selector:
     matchLabels:
-      app: {{ .Release.Name }}-consumer
+      app: {{ $.Release.Name }}-{{ $consumer.name }}
   template:
     metadata:
       labels:
-        app: {{ .Release.Name }}-consumer
+        app: {{ $.Release.Name }}-{{ $consumer.name }}
     spec:
-      serviceAccountName: {{ .Values.serviceAccount.name }} # should be in the same namespace as the deployment
+      nodeSelector:
+      {{- with $.Values.nodeSelector }}
+          {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $consumer.nodeSelector }}
+          {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ $.Values.serviceAccount.name }} # should be in the same namespace as the deployment
       volumes:
         - name: spc-volume
           csi:
             driver: secrets-store.csi.k8s.io
             readOnly: true
             volumeAttributes:
-              secretProviderClass: {{ .Release.Name }}-spc
-      {{- if .Values.consumer.initContainers }}
+              secretProviderClass: {{ $.Release.Name }}-spc
+      {{- if $.Values.initContainers }}
       initContainers:
-        {{- range $initContainer := .Values.consumer.initContainers }}
+        {{- range $initContainer := $consumer.initContainers }}
         - name: {{ $initContainer.name }}
           image: {{ $initContainer.image }}
           imagePullPolicy: {{ $initContainer.imagePullPolicy }}
@@ -36,23 +44,23 @@ spec:
         {{- end }}
       {{- end }}
       containers:
-        - name: {{ .Release.Name }}-consumer
-          image: {{ .Values.image }}
+        - name: {{ $.Release.Name }}-{{ $consumer.name }}
+          image: {{ $.Values.image }}
           command:
-            {{- range .Values.consumer.command }}
+            {{- range $consumer.command }}
             - {{ . }}
             {{- end }}
-          args: {{ .Values.consumer.args }}
+          args: {{ $consumer.args }}
           resources:
             requests:
-              memory: {{ .Values.consumer.resources.requests.memory }}
-              cpu: {{ .Values.consumer.resources.requests.cpu }}
+              memory: {{ $consumer.resources.requests.memory }}
+              cpu: {{ $consumer.resources.requests.cpu }}
           volumeMounts:
             - name: spc-volume
               mountPath: "/mnt/secrets-store"
               readOnly: true
           env:
-            {{- range $secret := .Values.secrets.envs }}
+            {{- range $secret := $.Values.secrets.envs }}
             - name: {{ $secret.name }}
               valueFrom:
                 secretKeyRef:

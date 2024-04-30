@@ -6,18 +6,30 @@ metadata:
   namespace: {{ .Release.namespace }}
   labels:
     app: {{ .Release.Name }}-app
-    tenant: prosperi
+    tenant: {{ .Values.tenant }}
     env: {{ .Values.environment }}
+    external-nlb: {{ .Values.externalNlb }}
 spec:
   replicas: {{ .Values.app.replicaCount }}
   selector:
     matchLabels:
       app: {{ .Release.Name }}-app
+      env: {{ .Values.environment }}
+      external-nlb: {{ .Values.externalNlb }}
   template:
     metadata:
       labels:
         app: {{ .Release.Name }}-app
+        env: {{ .Values.environment }}
+        external-nlb: {{ .Values.externalNlb }}
     spec:
+      nodeSelector:
+      {{- with .Values.nodeSelector }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.app.nodeSelector }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       serviceAccountName: {{ .Values.serviceAccount.name }} # should be in the same namespace as the deployment
       volumes:
         - name: {{ .Release.Name }}-spc-volume
@@ -26,9 +38,9 @@ spec:
             readOnly: true
             volumeAttributes:
               secretProviderClass: {{ .Release.Name }}-spc
-      {{- if .Values.consumer.initContainers }}
+      {{- if .Values.initContainers }}
       initContainers:
-        {{- range $initContainer := .Values.consumer.initContainers }}
+        {{- range $initContainer := .Values.initContainers }}
         - name: {{ $initContainer.name }}
           image: {{ $initContainer.image }}
           imagePullPolicy: {{ $initContainer.imagePullPolicy }}
@@ -40,8 +52,9 @@ spec:
           image: {{ .Values.image }}
           ports:
             - containerPort: {{ .Values.targetPort }}
+              name: {{ .Release.Name }}-app-port
           command:
-            {{- range .Values.consumer.command }}
+            {{- range .Values.app.command }}
             - {{ . }}
             {{- end }}
           args: {{ .Values.app.args }}
