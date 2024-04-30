@@ -7,7 +7,7 @@ metadata:
   namespace: {{ $.Release.Namespace }}
   labels:
     app: {{ $.Release.Name }}-{{ $job.name }}
-    tenant: {{ .Values.tenant }}
+    tenant: {{ $.Values.tenant }}
     env: {{ $.Values.environment }}
 spec:
   ttlSecondsAfterFinished: {{ $job.ttlSecondsAfterFinished }}
