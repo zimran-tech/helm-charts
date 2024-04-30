@@ -41,15 +41,18 @@ app:
   args: [ "cd", "src", "&&", "gunicorn", "core.wsgi:application", "--bind", "0.0.0.0:8000" ]
   enabled: true
 
-consumer:
-  resources:
-    requests:
-      memory: "96M"
-      cpu: "0.05"
-  replicaCount: 1
-  command: [ "/bin/sh", "-c" ]
-  args: [ "cd", "src", "&&", "python3", "-m", "consumer" ]
-  enabled: false
+
+consumers:
+#  - name: consumer
+#    resources:
+#      requests:
+#        memory: "96M"
+#        cpu: "0.05"
+#    replicaCount: 1
+#    command: [ "/bin/sh", "-c"]
+#    args: [ "cd", "src", "&&", "python3", "-m", "consumer" ]
+#    enabled: true
+
 
 jobs:
 #  - name: db-migration-job
