@@ -6,20 +6,24 @@ metadata:
   namespace: {{ .Release.namespace }}
   labels:
     app: {{ .Release.Name }}-app
-    tenant: prosperi
+    tenant: {{ .Values.tenant }}
     env: {{ .Values.environment }}
 spec:
   replicas: {{ .Values.app.replicaCount }}
   selector:
     matchLabels:
       app: {{ .Release.Name }}-app
+      externalNlb: {{ .Values.externalNlb }}
   template:
     metadata:
       labels:
         app: {{ .Release.Name }}-app
+        externalNlb: {{ .Values.externalNlb }}
     spec:
+      {{- with .Values.nodeSelector }}
       nodeSelector:
-        app_node_group: {{ .Values.nodeGroup }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       serviceAccountName: {{ .Values.serviceAccount.name }} # should be in the same namespace as the deployment
       volumes:
         - name: {{ .Release.Name }}-spc-volume
@@ -42,6 +46,7 @@ spec:
           image: {{ .Values.image }}
           ports:
             - containerPort: {{ .Values.targetPort }}
+              name: {{ .Release.Name }}-app-port
           command:
             {{- range .Values.consumer.command }}
             - {{ . }}
