@@ -44,7 +44,10 @@ spec:
         - name: {{ $initContainer.name }}
           image: {{ $initContainer.image }}
           imagePullPolicy: {{ $initContainer.imagePullPolicy }}
-          args: {{ $initContainer.args }}
+          args:
+            {{- range $arg := $initContainer.args }}
+            - {{ $arg }}
+            {{- end }}
         {{- end }}
       {{- end }}
       containers:
@@ -52,7 +55,7 @@ spec:
           image: {{ .Values.image }}
           ports:
             - containerPort: {{ .Values.targetPort }}
-              name: {{ .Release.Name }}-app-port
+              name: {{ .Release.Name }}
           command:
             {{- range .Values.app.command }}
             - {{ . }}
