@@ -8,17 +8,20 @@ metadata:
     app: {{ .Release.Name }}-app
     tenant: {{ .Values.tenant }}
     env: {{ .Values.environment }}
+    external-nlb: {{ .Values.externalNlb }}
 spec:
   replicas: {{ .Values.app.replicaCount }}
   selector:
     matchLabels:
       app: {{ .Release.Name }}-app
-      externalNlb: {{ .Values.externalNlb }}
+      env: {{ .Values.environment }}
+      external-nlb: {{ .Values.externalNlb }}
   template:
     metadata:
       labels:
         app: {{ .Release.Name }}-app
-        externalNlb: {{ .Values.externalNlb }}
+        env: {{ .Values.environment }}
+        external-nlb: {{ .Values.externalNlb }}
     spec:
       {{- with .Values.nodeSelector }}
       nodeSelector:

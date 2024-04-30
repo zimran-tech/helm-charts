@@ -7,8 +7,9 @@ metadata:
 spec:
   selector:
     app: {{ .Release.Name }}-app
+    env: {{ .Values.environment }}
   ports:
     - protocol: TCP
       port: {{ .Values.port }}
-      targetPort: {{ .Values.targetPort }}
+      targetPort: {{ .Release.Name }}-app-port
 {{- end}}

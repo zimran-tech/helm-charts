@@ -2,7 +2,7 @@ image: IMAGE # specify image explicitly
 
 environment: staging
 tenant: prosperi
-externalNlb: nlb-prosperi-services-staging
+externalNlb: nlb-prosperi-services
 
 nodeSelector: {
   app_node_group: prosperi-staging
@@ -37,7 +37,7 @@ app:
       memory: "96M"
       cpu: "0.05"
   replicaCount: 1
-  command: [ "/bin/sh", "-c"]
+  command: [ "/bin/sh", "-c" ]
   args: [ "cd", "src", "&&", "gunicorn", "core.wsgi:application", "--bind", "0.0.0.0:8000" ]
   enabled: true
 
@@ -47,7 +47,7 @@ consumer:
       memory: "96M"
       cpu: "0.05"
   replicaCount: 1
-  command: [ "/bin/sh", "-c"]
+  command: [ "/bin/sh", "-c" ]
   args: [ "cd", "src", "&&", "python3", "-m", "consumer" ]
   enabled: false
 
