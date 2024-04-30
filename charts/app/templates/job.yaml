@@ -36,7 +36,7 @@ spec:
         - name: {{ $.Release.Name }}-{{ $job.name }}
           image: {{ $.Values.image }}
           command:
-            {{- range $.Values.consumer.command }}
+            {{- range $job.command }}
             - {{ . }}
             {{- end }}
           args: {{ $job.args }}
