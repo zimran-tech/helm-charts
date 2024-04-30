@@ -6,7 +6,11 @@ nodeGroup: prosperi-staging
 port: 2000 # specify port explicitly
 targetPort: 8000
 
+service:
+  enabled: false
+
 ingress:
+  enabled: false
   class: alb
   annotations: {
     kubernetes.io/ingress.class: alb,

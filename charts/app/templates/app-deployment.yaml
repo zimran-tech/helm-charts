@@ -13,10 +13,12 @@ spec:
   selector:
     matchLabels:
       app: {{ .Release.Name }}-app
+      lbtype: external
   template:
     metadata:
       labels:
         app: {{ .Release.Name }}-app
+        lbtype: external
     spec:
       nodeSelector:
         app_node_group: {{ .Values.nodeGroup }}
