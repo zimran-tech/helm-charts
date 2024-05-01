@@ -2,17 +2,15 @@ image: IMAGE # specify image explicitly
 
 environment: staging
 tenant: prosperi
-externalNlb: nlb-prosperi-services
 
 nodeSelector: {
   app_node_group: prosperi-staging
 }
 
-port: 2000 # specify port explicitly
-targetPort: 8000
-
-service:
-  enabled: false
+network:
+  port: 2000 # specify port explicitly
+  containerTargetPort: 8000
+  serviceEnabled: false
 
 ingress:
   enabled: false
@@ -39,7 +37,7 @@ apps:
     replicaCount: 1
     command: [ "/bin/sh", "-c" ]
     args: [ "cd", "src", "&&", "gunicorn", "core.wsgi:application", "--bind", "0.0.0.0:8000" ]
-    useNlb: true
+    externalNlb: nlb-prosperi-services
     #    nodeSelector: {
     #      app_node_group: prosperi-staging
     #    }
