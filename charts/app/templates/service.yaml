@@ -11,5 +11,5 @@ spec:
   ports:
     - protocol: TCP
       port: {{ .Values.port }}
-      targetPort: {{ .Release.Name }}-app-port
+      targetPort: {{ .Release.Name }}
 {{- end}}
