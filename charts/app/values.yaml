@@ -30,7 +30,7 @@ serviceAccount:
     roleArn: ROLE_ARN
   }
 
-services:
+apps:
   - name: app
     resources:
       requests:

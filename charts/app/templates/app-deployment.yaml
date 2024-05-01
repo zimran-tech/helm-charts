@@ -1,32 +1,32 @@
-{{- range $service := .Values.services }}
+{{- range $app := .Values.apps }}
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ $.Release.Name }}-{{ $service.name }}-deploy
+  name: {{ $.Release.Name }}-{{ $app.name }}-deploy
   namespace: {{ $.Release.Namespace }}
   labels:
-    app: {{ $.Release.Name }}-{{ $service.name }}
+    app: {{ $.Release.Name }}-{{ $app.name }}
     tenant: {{ $.Values.tenant }}
     env: {{ $.Values.environment }}
-    {{- if $service.useNlb }}
+    {{- if $app.useNlb }}
     external-nlb: {{ .Values.externalNlb }}
     {{- end }}
 spec:
-  replicas: {{ $service.replicaCount }}
+  replicas: {{ $app.replicaCount }}
   selector:
     matchLabels:
-      app: {{ $.Release.Name }}-{{ $service.name }}
+      app: {{ $.Release.Name }}-{{ $app.name }}
       env: {{ $.Values.environment }}
-      {{- if $service.useNlb }}
+      {{- if $app.useNlb }}
       external-nlb: {{ .Values.externalNlb }}
       {{- end }}
   template:
     metadata:
       labels:
-        app: {{ $.Release.Name }}-{{ $service.name }}
+        app: {{ $.Release.Name }}-{{ $app.name }}
         env: {{ $.Values.environment }}
-        {{- if $service.useNlb }}
+        {{- if $app.useNlb }}
         external-nlb: {{ .Values.externalNlb }}
         {{- end }}
     spec:
@@ -34,7 +34,7 @@ spec:
       {{- with $.Values.nodeSelector }}
           {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with $service.nodeSelector }}
+      {{- with $app.nodeSelector }}
           {{- toYaml . | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ $.Values.serviceAccount.name }} # should be in the same namespace as the deployment
@@ -58,24 +58,24 @@ spec:
         {{- end }}
       {{- end }}
       containers:
-        - name: {{ $.Release.Name }}-{{ $service.name }}
+        - name: {{ $.Release.Name }}-{{ $app.name }}
           image: {{ $.Values.image }}
-          {{- if $service.useNlb }}
+          {{- if $app.useNlb }}
           ports:
             - containerPort: {{ .Values.targetPort }}
               name: {{ .Release.Name }}
           {{- end }}
           command:
-            {{- range $service.command }}
+            {{- range $app.command }}
             - {{ . }}
             {{- end }}
-          args: {{ $service.args }}
+          args: {{ $app.args }}
           resources:
             requests:
-              memory: {{ $service.resources.requests.memory }}
-              cpu: {{ $service.resources.requests.cpu }}
+              memory: {{ $app.resources.requests.memory }}
+              cpu: {{ $app.resources.requests.cpu }}
           volumeMounts:
-            - name: spc-volume
+            - name: {{ .Release.Name }}-spc-volume
               mountPath: "/mnt/secrets-store"
               readOnly: true
           env:
