@@ -30,22 +30,19 @@ serviceAccount:
     roleArn: ROLE_ARN
   }
 
-
-app:
-  resources:
-    requests:
-      memory: "96M"
-      cpu: "0.05"
-  replicaCount: 1
-  command: [ "/bin/sh", "-c" ]
-  args: [ "cd", "src", "&&", "gunicorn", "core.wsgi:application", "--bind", "0.0.0.0:8000" ]
-  enabled: true
-  #    nodeSelector: {
-  #      app_node_group: prosperi-staging
-  #    }
-
-
-consumers:
+services:
+  - name: app
+    resources:
+      requests:
+        memory: "96M"
+        cpu: "0.05"
+    replicaCount: 1
+    command: [ "/bin/sh", "-c" ]
+    args: [ "cd", "src", "&&", "gunicorn", "core.wsgi:application", "--bind", "0.0.0.0:8000" ]
+    useNlb: true
+    #    nodeSelector: {
+    #      app_node_group: prosperi-staging
+    #    }
 #  - name: consumer
 #    resources:
 #      requests:

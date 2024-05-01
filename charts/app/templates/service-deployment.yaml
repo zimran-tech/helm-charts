@@ -1,29 +1,40 @@
-{{- range $consumer := .Values.consumers }}
+{{- range $service := .Values.services }}
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ $.Release.Name }}-{{ $consumer.name }}-deploy
+  name: {{ $.Release.Name }}-{{ $service.name }}-deploy
   namespace: {{ $.Release.Namespace }}
   labels:
-    app: {{ $.Release.Name }}-consumer
+    app: {{ $.Release.Name }}-{{ $service.name }}
     tenant: {{ $.Values.tenant }}
     env: {{ $.Values.environment }}
+    {{- if $service.useNlb }}
+    external-nlb: {{ .Values.externalNlb }}
+    {{- end }}
 spec:
-  replicas: {{ $consumer.replicaCount }}
+  replicas: {{ $service.replicaCount }}
   selector:
     matchLabels:
-      app: {{ $.Release.Name }}-{{ $consumer.name }}
+      app: {{ $.Release.Name }}-{{ $service.name }}
+      env: {{ $.Values.environment }}
+      {{- if $service.useNlb }}
+      external-nlb: {{ .Values.externalNlb }}
+      {{- end }}
   template:
     metadata:
       labels:
-        app: {{ $.Release.Name }}-{{ $consumer.name }}
+        app: {{ $.Release.Name }}-{{ $service.name }}
+        env: {{ $.Values.environment }}
+        {{- if $service.useNlb }}
+        external-nlb: {{ .Values.externalNlb }}
+        {{- end }}
     spec:
       nodeSelector:
       {{- with $.Values.nodeSelector }}
           {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with $consumer.nodeSelector }}
+      {{- with $service.nodeSelector }}
           {{- toYaml . | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ $.Values.serviceAccount.name }} # should be in the same namespace as the deployment
@@ -47,17 +58,22 @@ spec:
         {{- end }}
       {{- end }}
       containers:
-        - name: {{ $.Release.Name }}-{{ $consumer.name }}
+        - name: {{ $.Release.Name }}-{{ $service.name }}
           image: {{ $.Values.image }}
+          {{- if $service.useNlb }}
+          ports:
+            - containerPort: {{ .Values.targetPort }}
+              name: {{ .Release.Name }}
+          {{- end }}
           command:
-            {{- range $consumer.command }}
+            {{- range $service.command }}
             - {{ . }}
             {{- end }}
-          args: {{ $consumer.args }}
+          args: {{ $service.args }}
           resources:
             requests:
-              memory: {{ $consumer.resources.requests.memory }}
-              cpu: {{ $consumer.resources.requests.cpu }}
+              memory: {{ $service.resources.requests.memory }}
+              cpu: {{ $service.resources.requests.cpu }}
           volumeMounts:
             - name: spc-volume
               mountPath: "/mnt/secrets-store"
