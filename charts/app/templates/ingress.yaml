@@ -19,5 +19,5 @@ spec:
               service:
                 name: {{ .Release.Name }}-svc
                 port:
-                  number: {{ .Values.port }}
+                  number: {{ .Values.network.port }}
 {{- end}}
