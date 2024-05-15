@@ -74,6 +74,11 @@ spec:
             requests:
               memory: {{ $app.resources.requests.memory }}
               cpu: {{ $app.resources.requests.cpu }}
+            {{- if $app.resources.limits }}
+            limits:
+              memory: {{ $app.resources.limits.memory }}
+              cpu: {{ $app.resources.limits.cpu }}
+            {{- end }}
           volumeMounts:
             - name: spc-volume
               mountPath: "/mnt/secrets-store"
