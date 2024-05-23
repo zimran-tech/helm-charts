@@ -20,6 +20,7 @@ ingress:
     alb.ingress.kubernetes.io/scheme: internet-facing,
     alb.ingress.kubernetes.io/target-type: ip,
     alb.ingress.kubernetes.io/certificate-arn: CERTIFICATE_ARN,
+    "helm.sh/resource-policy": keep,
   }
 
 serviceAccount:
