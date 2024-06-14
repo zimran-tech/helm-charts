@@ -20,6 +20,7 @@ ingress:
     alb.ingress.kubernetes.io/scheme: internet-facing,
     alb.ingress.kubernetes.io/target-type: ip,
     alb.ingress.kubernetes.io/certificate-arn: CERTIFICATE_ARN,
+    "helm.sh/resource-policy": keep,
   }
 
 serviceAccount:
@@ -38,6 +39,7 @@ apps:
     command: [ "/bin/sh", "-c" ]
     args: [ "cd", "src", "&&", "gunicorn", "core.wsgi:application", "--bind", "0.0.0.0:8000" ]
     externalNlb: nlb-prosperi-services
+    exposePort: true
     #    nodeSelector: {
     #      app_node_group: prosperi-staging
     #    }
