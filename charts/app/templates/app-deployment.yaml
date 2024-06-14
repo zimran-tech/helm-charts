@@ -29,6 +29,8 @@ spec:
         {{- if $app.externalNlb }}
         external-nlb: {{ $app.externalNlb }}
         {{- end }}
+      annotations:
+        rollme: {{ randAlphaNum 5 | quote }}
     spec:
       nodeSelector:
       {{- with $.Values.nodeSelector }}
@@ -67,7 +69,7 @@ spec:
           {{- end }}
           command:
             {{- range $app.command }}
-            - {{ . }}
+            - {{ . }}\
             {{- end }}
           args: {{ $app.args }}
           resources:
