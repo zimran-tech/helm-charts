@@ -29,6 +29,8 @@ spec:
         {{- if $app.externalNlb }}
         external-nlb: {{ $app.externalNlb }}
         {{- end }}
+      annotations:
+        rollme: {{ randAlphaNum 5 | quote }}
     spec:
       nodeSelector:
       {{- with $.Values.nodeSelector }}
@@ -60,7 +62,7 @@ spec:
       containers:
         - name: {{ $.Release.Name }}-{{ $app.name }}
           image: {{ $.Values.image }}
-          {{- if $app.externalNlb }}
+          {{- if $app.exposePort }}
           ports:
             - containerPort: {{ $.Values.network.containerTargetPort }}
               name: {{ $.Release.Name }}
