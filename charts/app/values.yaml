@@ -39,6 +39,7 @@ apps:
     command: [ "/bin/sh", "-c" ]
     args: [ "cd", "src", "&&", "gunicorn", "core.wsgi:application", "--bind", "0.0.0.0:8000" ]
     externalNlb: nlb-prosperi-services
+    exposePort: true
     #    nodeSelector: {
     #      app_node_group: prosperi-staging
     #    }

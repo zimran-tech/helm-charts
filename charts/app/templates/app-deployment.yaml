@@ -62,7 +62,7 @@ spec:
       containers:
         - name: {{ $.Release.Name }}-{{ $app.name }}
           image: {{ $.Values.image }}
-          {{- if $app.externalNlb }}
+          {{- if $app.exposePort }}
           ports:
             - containerPort: {{ $.Values.network.containerTargetPort }}
               name: {{ $.Release.Name }}
