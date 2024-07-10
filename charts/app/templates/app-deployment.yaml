@@ -47,18 +47,6 @@ spec:
             readOnly: true
             volumeAttributes:
               secretProviderClass: {{ $.Release.Name }}-spc
-      {{- if $.Values.initContainers }}
-      initContainers:
-        {{- range $initContainer := $.Values.initContainers }}
-        - name: {{ $initContainer.name }}
-          image: {{ $initContainer.image }}
-          imagePullPolicy: {{ $initContainer.imagePullPolicy }}
-          args:
-            {{- range $arg := $initContainer.args }}
-            - {{ $arg }}
-            {{- end }}
-        {{- end }}
-      {{- end }}
       containers:
         - name: {{ $.Release.Name }}-{{ $app.name }}
           image: {{ $.Values.image }}
@@ -93,4 +81,12 @@ spec:
                   name: {{ $.Release.Name }}-secret
                   key: {{ $secret.name }}
             {{- end }}
+          {{- if $app.readinessProbe }}
+          readinessProbe:
+            httpGet:
+              port: {{ $.Values.network.containerTargetPort }}
+              path: {{ $app.readinessProbe.httpGet.path }}
+            periodSeconds: {{ $app.readinessProbe.periodSeconds }}
+            initialDelaySeconds: {{ $app.readinessProbe.initialDelaySeconds }}
+          {{- end }}
 {{ end }}
