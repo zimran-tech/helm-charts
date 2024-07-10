@@ -40,6 +40,11 @@ apps:
     args: [ "cd", "src", "&&", "gunicorn", "core.wsgi:application", "--bind", "0.0.0.0:8000" ]
     externalNlb: nlb-prosperi-services
     exposePort: true
+    readinessProbe:
+      httpGet:
+        path: /health/
+      initialDelaySeconds: 5
+      periodSeconds: 5
     #    nodeSelector: {
     #      app_node_group: prosperi-staging
     #    }
@@ -58,15 +63,6 @@ apps:
 
 
 jobs:
-#  - name: db-migration-job
-#    ttlSecondsAfterFinished: 100
-#    restartPolicy: Never
-#    resources:
-#      requests:
-#        memory: "96M"
-#        cpu: "0.05"
-#  command: [ "/bin/sh", "-c"]
-#    args: [ "python3", "src/manage.py", "migrate" ]
 #  - name: collect-static-job
 #    ttlSecondsAfterFinished: 10
 #    restartPolicy: Never
@@ -78,14 +74,6 @@ jobs:
 #    nodeSelector: {
 #      app_node_group: prosperi-staging
 #    }
-
-initContainers:
-#  - name: migrations-waiting-init
-#    image: ghcr.io/groundnuty/k8s-wait-for:v2.0
-#    imagePullPolicy: IfNotPresent
-#    args:
-#      - "job"
-#      - "{{ $.Release.Name }}-{{ $dbMigrationJob.name }}"
 
 secrets:
   awsSecretName: APP/ENVIRONMENT/SECRET_NAME # specify secret name explicitly
