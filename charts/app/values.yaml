@@ -22,6 +22,7 @@ ingress:
     alb.ingress.kubernetes.io/certificate-arn: CERTIFICATE_ARN,
     "helm.sh/resource-policy": keep,
   }
+  domain: domain.com
 
 serviceAccount:
   name: SERVICE_ACCOUNT_NAME
