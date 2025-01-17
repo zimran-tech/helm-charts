@@ -77,7 +77,7 @@ spec:
             - name: SECRET_KEY
               valueFrom:
                 secretKeyRef:
-                  name: base-secret
+                  name: encode-test-secret
                   key: SECRET_KEY
             {{- range $secret := $.Values.secrets.envs }}
             - name: {{ $secret.name }}
