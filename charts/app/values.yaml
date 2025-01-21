@@ -77,6 +77,7 @@ jobs:
 #    }
 
 secrets:
+  encryption: false
   awsSecretName: APP/ENVIRONMENT/SECRET_NAME # specify secret name explicitly
   envs:
     - name: DATABASE_URL
