@@ -74,7 +74,7 @@ spec:
               mountPath: "/mnt/secrets-store"
               readOnly: true
           env:
-            {{- if .Values.secrets.encryption }}
+            {{- if $.Values.secrets.encryption }}
             - name: SECRET_KEY
               valueFrom:
                 secretKeyRef:
