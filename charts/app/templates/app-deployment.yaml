@@ -41,12 +41,6 @@ spec:
       {{- end }}
       serviceAccountName: {{ $.Values.serviceAccount.name }} # should be in the same namespace as the deployment
       volumes:
-        - name: base-volume
-          csi:
-            driver: secrets-store.csi.k8s.io
-            readOnly: true
-            volumeAttributes:
-              secretProviderClass: encode-test-spc
         - name: spc-volume
           csi:
             driver: secrets-store.csi.k8s.io
@@ -77,9 +71,6 @@ spec:
             {{- end }}
           volumeMounts:
             - name: spc-volume
-              mountPath: "/mnt/secrets-store"
-              readOnly: true
-            - name: base-volume
               mountPath: "/mnt/secrets-store"
               readOnly: true
           env:
