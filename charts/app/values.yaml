@@ -46,6 +46,13 @@ apps:
         path: /health/
       initialDelaySeconds: 5
       periodSeconds: 5
+    # HPA configuration
+    autoscaling:
+      enabled: true
+      minReplicas: 1
+      maxReplicas: 5
+      targetCPUUtilizationPercentage: 80
+      targetMemoryUtilizationPercentage: 80
     #    nodeSelector: {
     #      app_node_group: prosperi-staging
     #    }
@@ -77,7 +84,6 @@ jobs:
 #    }
 
 secrets:
-  encryption: false
   awsSecretName: APP/ENVIRONMENT/SECRET_NAME # specify secret name explicitly
   envs:
     - name: DATABASE_URL
