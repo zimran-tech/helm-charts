@@ -74,11 +74,6 @@ spec:
               mountPath: "/mnt/secrets-store"
               readOnly: true
           env:
-            - name: SECRET_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: base-secret
-                  key: SECRET_KEY
             {{- range $secret := $.Values.secrets.envs }}
             - name: {{ $secret.name }}
               valueFrom:
