@@ -1,5 +1,7 @@
 {{- range .Values.apps }}
+{{- if .autoscaling }}
 {{- if .autoscaling.enabled }}
+---
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
@@ -31,5 +33,6 @@ spec:
           type: Utilization
           averageUtilization: {{ .autoscaling.targetMemoryUtilizationPercentage }}
     {{- end }}
+{{- end }}
 {{- end }}
 {{- end }} 
