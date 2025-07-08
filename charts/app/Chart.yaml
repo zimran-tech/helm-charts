@@ -2,5 +2,5 @@ apiVersion: v2
 name: app
 description: A Helm chart for Prosperi Applications
 type: application
-version: 2.5.1
+version: 2.6.0
 appVersion: 1.0.0
