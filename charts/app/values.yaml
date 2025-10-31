@@ -22,7 +22,13 @@ ingress:
     alb.ingress.kubernetes.io/certificate-arn: CERTIFICATE_ARN,
     "helm.sh/resource-policy": keep,
   }
+  # Single domain configuration (backward compatible)
   domain: domain.com
+  # Multiple domains configuration (uncomment and remove domain above to use)
+  # domains:
+  #   - app.example.com
+  #   - api.example.com
+  #   - app.example.org
 
 serviceAccount:
   name: SERVICE_ACCOUNT_NAME
