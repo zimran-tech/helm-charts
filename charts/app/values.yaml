@@ -32,9 +32,6 @@ ingress:
 
 serviceAccount:
   name: SERVICE_ACCOUNT_NAME
-  annotations: {
-    roleArn: ROLE_ARN
-  }
 
 apps:
   - name: app
@@ -52,6 +49,22 @@ apps:
         path: /health/
       initialDelaySeconds: 5
       periodSeconds: 5
+    # Liveness probe configuration (optional)
+    livenessProbe:
+      httpGet:
+        path: /health/
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 3
+    # Startup probe configuration (optional) - useful for slow-starting containers
+    startupProbe:
+      httpGet:
+        path: /health/
+      initialDelaySeconds: 0
+      periodSeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 30
     # HPA configuration
     autoscaling:
       enabled: true
@@ -59,6 +72,30 @@ apps:
       maxReplicas: 5
       targetCPUUtilizationPercentage: 80
       targetMemoryUtilizationPercentage: 80
+      # HPA behavior policies (optional) - prevents thrashing
+      # Defaults are provided, you can override them here
+      # scaleDownStabilizationWindowSeconds: 300
+      # scaleDownPercent: 50
+      # scaleDownPods: 1
+      # scaleDownPeriodSeconds: 60
+      # scaleUpStabilizationWindowSeconds: 0
+      # scaleUpPercent: 100
+      # scaleUpPods: 2
+      # scaleUpPeriodSeconds: 15
+      # Or provide custom behavior:
+      # behavior:
+      #   scaleDown:
+      #     stabilizationWindowSeconds: 300
+      #     policies:
+      #     - type: Percent
+      #       value: 50
+      #       periodSeconds: 60
+      #   scaleUp:
+      #     stabilizationWindowSeconds: 0
+      #     policies:
+      #     - type: Percent
+      #       value: 100
+      #       periodSeconds: 15
     #    nodeSelector: {
     #      app_node_group: prosperi-staging
     #    }
