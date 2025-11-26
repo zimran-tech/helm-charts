@@ -34,8 +34,10 @@ spec:
         {{- if $app.externalNlb }}
         external-nlb: {{ $app.externalNlb }}
         {{- end }}
+      {{- with $app.podAnnotations }}
       annotations:
-        rollme: {{ randAlphaNum 5 | quote }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
     spec:
       nodeSelector:
       {{- with $.Values.nodeSelector }}
