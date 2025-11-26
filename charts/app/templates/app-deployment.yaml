@@ -12,6 +12,11 @@ metadata:
     {{- if $app.externalNlb }}
     external-nlb: {{ $app.externalNlb }}
     {{- end }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+    {{- with $app.annotations }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
 spec:
   replicas: {{ $app.replicaCount }}
   selector:

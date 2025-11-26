@@ -9,6 +9,8 @@ metadata:
   labels:
     app: {{ $app.name }}
     release: {{ $.Release.Name }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
 spec:
   scaleTargetRef:
     apiVersion: apps/v1

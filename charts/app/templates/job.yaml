@@ -9,6 +9,17 @@ metadata:
     app: {{ $.Release.Name }}-{{ $job.name }}
     tenant: {{ $.Values.tenant }}
     env: {{ $.Values.environment }}
+  annotations:
+    {{- if eq $job.name "migration" }}
+      argocd.argoproj.io/hook: PreSync
+      argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+      argocd.argoproj.io/sync-wave: "-1"
+    {{- else }}
+      argocd.argoproj.io/sync-wave: "0"
+    {{- end }}
+    {{- with $job.annotations }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
 spec:
   ttlSecondsAfterFinished: {{ $job.ttlSecondsAfterFinished }}
   template:
