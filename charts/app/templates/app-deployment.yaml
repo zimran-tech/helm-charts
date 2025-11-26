@@ -94,4 +94,24 @@ spec:
             periodSeconds: {{ $app.readinessProbe.periodSeconds }}
             initialDelaySeconds: {{ $app.readinessProbe.initialDelaySeconds }}
           {{- end }}
+          {{- if $app.livenessProbe }}
+          livenessProbe:
+            httpGet:
+              port: {{ $.Values.network.containerTargetPort }}
+              path: {{ $app.livenessProbe.httpGet.path }}
+            periodSeconds: {{ $app.livenessProbe.periodSeconds | default 10 }}
+            initialDelaySeconds: {{ $app.livenessProbe.initialDelaySeconds | default 30 }}
+            timeoutSeconds: {{ $app.livenessProbe.timeoutSeconds | default 5 }}
+            failureThreshold: {{ $app.livenessProbe.failureThreshold | default 3 }}
+          {{- end }}
+          {{- if $app.startupProbe }}
+          startupProbe:
+            httpGet:
+              port: {{ $.Values.network.containerTargetPort }}
+              path: {{ $app.startupProbe.httpGet.path }}
+            periodSeconds: {{ $app.startupProbe.periodSeconds | default 10 }}
+            initialDelaySeconds: {{ $app.startupProbe.initialDelaySeconds | default 0 }}
+            timeoutSeconds: {{ $app.startupProbe.timeoutSeconds | default 5 }}
+            failureThreshold: {{ $app.startupProbe.failureThreshold | default 30 }}
+          {{- end }}
 {{ end }}
