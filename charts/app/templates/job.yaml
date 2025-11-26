@@ -11,8 +11,12 @@ metadata:
     env: {{ $.Values.environment }}
   annotations:
     {{- if eq $job.name "migration" }}
+      argocd.argoproj.io/hook: Sync
+      argocd.argoproj.io/hook-delete-policy: HookSucceeded
       argocd.argoproj.io/sync-wave: "-1"
     {{- else }}
+      argocd.argoproj.io/hook: Sync
+      argocd.argoproj.io/hook-delete-policy: HookSucceeded
       argocd.argoproj.io/sync-wave: "0"
     {{- end }}
     {{- with $job.annotations }}
