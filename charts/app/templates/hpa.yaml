@@ -9,6 +9,8 @@ metadata:
   labels:
     app: {{ $app.name }}
     release: {{ $.Release.Name }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
@@ -33,6 +35,32 @@ spec:
           type: Utilization
           averageUtilization: {{ $app.autoscaling.targetMemoryUtilizationPercentage }}
     {{- end }}
+  {{- if $app.autoscaling.behavior }}
+  behavior:
+    {{- toYaml $app.autoscaling.behavior | nindent 4 }}
+  {{- else }}
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: {{ $app.autoscaling.scaleDownStabilizationWindowSeconds | default 300 }}
+      policies:
+      - type: Percent
+        value: {{ $app.autoscaling.scaleDownPercent | default 50 }}
+        periodSeconds: {{ $app.autoscaling.scaleDownPeriodSeconds | default 60 }}
+      - type: Pods
+        value: {{ $app.autoscaling.scaleDownPods | default 1 }}
+        periodSeconds: {{ $app.autoscaling.scaleDownPeriodSeconds | default 60 }}
+      selectPolicy: Min
+    scaleUp:
+      stabilizationWindowSeconds: {{ $app.autoscaling.scaleUpStabilizationWindowSeconds | default 0 }}
+      policies:
+      - type: Percent
+        value: {{ $app.autoscaling.scaleUpPercent | default 100 }}
+        periodSeconds: {{ $app.autoscaling.scaleUpPeriodSeconds | default 15 }}
+      - type: Pods
+        value: {{ $app.autoscaling.scaleUpPods | default 2 }}
+        periodSeconds: {{ $app.autoscaling.scaleUpPeriodSeconds | default 15 }}
+      selectPolicy: Max
+  {{- end }}
 {{- end }}
 {{- end }}
 {{- end }}
