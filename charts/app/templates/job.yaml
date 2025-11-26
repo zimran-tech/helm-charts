@@ -43,6 +43,14 @@ spec:
             readOnly: true
             volumeAttributes:
               secretProviderClass: {{ $.Release.Name }}-spc
+      initContainers:
+        - name: secrets-init
+          image: busybox:latest
+          command: ['sh', '-c', 'echo "Secrets synced to Kubernetes"; sleep 2']
+          volumeMounts:
+            - name: spc-volume
+              mountPath: "/mnt/secrets-store"
+              readOnly: true
       containers:
         - name: {{ $.Release.Name }}-{{ $job.name }}
           image: {{ $.Values.image }}
