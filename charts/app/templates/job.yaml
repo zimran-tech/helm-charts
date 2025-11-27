@@ -47,7 +47,8 @@ spec:
               secretProviderClass: {{ $.Release.Name }}-spc
       containers:
         - name: {{ $.Release.Name }}-{{ $job.name }}
-          image: {{ $.Values.image }}
+          image: "{{ $.Values.image.repository }}:{{ $.Values.image.tag }}"
+          imagePullPolicy: {{ $.Values.image.pullPolicy }}
           command:
             {{- range $job.command }}
             - {{ . }}
