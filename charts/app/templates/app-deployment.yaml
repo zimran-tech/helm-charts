@@ -56,7 +56,8 @@ spec:
               secretProviderClass: {{ $.Release.Name }}-spc
       containers:
         - name: {{ $.Release.Name }}-{{ $app.name }}
-          image: {{ $.Values.image }}
+          image: "{{ $.Values.image.repository }}:{{ $.Values.image.tag }}"
+          imagePullPolicy: {{ $.Values.image.pullPolicy }}
           {{- if $app.exposePort }}
           ports:
             - containerPort: {{ $.Values.network.containerTargetPort }}
