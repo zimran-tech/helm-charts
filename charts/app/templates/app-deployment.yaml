@@ -63,6 +63,9 @@ spec:
             - containerPort: {{ $.Values.network.containerTargetPort }}
               name: {{ $.Release.Name }}
           {{- end }}
+          {{- if $app.workingDir }}
+          workingDir: {{ $app.workingDir }}
+          {{- end }}
           command:
             {{- range $app.command }}
             - {{ . | quote }}
