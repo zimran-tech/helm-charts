@@ -51,11 +51,11 @@ spec:
           imagePullPolicy: {{ $.Values.image.pullPolicy }}
           command:
             {{- range $job.command }}
-            - {{ . }}
+            - {{ . | quote }}
             {{- end }}
           args: 
             {{- range $job.args }}
-            - {{ . }}
+            - {{ . | quote }}
             {{- end }}
           resources:
             requests:
