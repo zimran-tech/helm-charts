@@ -53,7 +53,10 @@ spec:
             {{- range $job.command }}
             - {{ . }}
             {{- end }}
-          args: {{ $job.args }}
+          args: 
+            {{- range $job.args }}
+            - {{ . }}
+            {{- end }}
           resources:
             requests:
               memory: {{ $job.resources.requests.memory }}

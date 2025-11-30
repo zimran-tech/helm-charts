@@ -67,7 +67,10 @@ spec:
             {{- range $app.command }}
             - {{ . }}
             {{- end }}
-          args: {{ $app.args }}
+          args: 
+            {{- range $app.args }}
+            - {{ . }}
+            {{- end }}
           resources:
             requests:
               memory: {{ $app.resources.requests.memory }}
