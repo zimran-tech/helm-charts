@@ -56,17 +56,24 @@ spec:
               secretProviderClass: {{ $.Release.Name }}-spc
       containers:
         - name: {{ $.Release.Name }}-{{ $app.name }}
-          image: {{ $.Values.image }}
+          image: "{{ $.Values.image.repository }}:{{ $.Values.image.tag }}"
+          imagePullPolicy: {{ $.Values.image.pullPolicy }}
           {{- if $app.exposePort }}
           ports:
             - containerPort: {{ $.Values.network.containerTargetPort }}
               name: {{ $.Release.Name }}
           {{- end }}
+          {{- if $app.workingDir }}
+          workingDir: {{ $app.workingDir }}
+          {{- end }}
           command:
             {{- range $app.command }}
-            - {{ . }}
+            - {{ . | quote }}
             {{- end }}
-          args: {{ $app.args }}
+          args: 
+            {{- range $app.args }}
+            - {{ . | quote }}
+            {{- end }}
           resources:
             requests:
               memory: {{ $app.resources.requests.memory }}

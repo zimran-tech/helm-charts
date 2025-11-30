@@ -1,4 +1,7 @@
-image: IMAGE # specify image explicitly
+image:
+  repository: repository
+  tag: "v1.0.0"  # Default/placeholder
+  pullPolicy: IfNotPresent
 
 environment: staging
 tenant: prosperi

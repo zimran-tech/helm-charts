@@ -11,10 +11,12 @@ metadata:
     env: {{ $.Values.environment }}
   annotations:
     {{- if eq $job.name "migration" }}
-      argocd.argoproj.io/hook: PreSync
-      argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+      argocd.argoproj.io/hook: Sync
+      argocd.argoproj.io/hook-delete-policy: HookSucceeded
       argocd.argoproj.io/sync-wave: "-1"
     {{- else }}
+      argocd.argoproj.io/hook: Sync
+      argocd.argoproj.io/hook-delete-policy: HookSucceeded
       argocd.argoproj.io/sync-wave: "0"
     {{- end }}
     {{- with $job.annotations }}
@@ -45,12 +47,19 @@ spec:
               secretProviderClass: {{ $.Release.Name }}-spc
       containers:
         - name: {{ $.Release.Name }}-{{ $job.name }}
-          image: {{ $.Values.image }}
+          image: "{{ $.Values.image.repository }}:{{ $.Values.image.tag }}"
+          imagePullPolicy: {{ $.Values.image.pullPolicy }}
+          {{- if $job.workingDir }}
+          workingDir: {{ $job.workingDir }}
+          {{- end }}
           command:
             {{- range $job.command }}
-            - {{ . }}
+            - {{ . | quote }}
             {{- end }}
-          args: {{ $job.args }}
+          args: 
+            {{- range $job.args }}
+            - {{ . | quote }}
+            {{- end }}
           resources:
             requests:
               memory: {{ $job.resources.requests.memory }}
