@@ -49,6 +49,9 @@ spec:
         - name: {{ $.Release.Name }}-{{ $job.name }}
           image: "{{ $.Values.image.repository }}:{{ $.Values.image.tag }}"
           imagePullPolicy: {{ $.Values.image.pullPolicy }}
+          {{- if $job.workingDir }}
+          workingDir: {{ $job.workingDir }}
+          {{- end }}
           command:
             {{- range $job.command }}
             - {{ . | quote }}
