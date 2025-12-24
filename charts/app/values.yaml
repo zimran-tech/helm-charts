@@ -1,30 +1,30 @@
+environment: staging
+
 image:
   repository: repository
-  tag: "v1.0.0"  # Default/placeholder
+  tag: "1.0.0"
   pullPolicy: IfNotPresent
-
-environment: staging
-tenant: prosperi
 
 nodeSelector: {
   app_node_group: prosperi-staging
 }
 
 network:
-  port: 2000 # specify port explicitly
+  port: 2000
   containerTargetPort: 8000
   serviceEnabled: false
 
 ingress:
   enabled: false
   class: alb
-  annotations: {
-    kubernetes.io/ingress.class: alb,
-    alb.ingress.kubernetes.io/scheme: internet-facing,
-    alb.ingress.kubernetes.io/target-type: ip,
-    alb.ingress.kubernetes.io/certificate-arn: CERTIFICATE_ARN,
-    "helm.sh/resource-policy": keep,
-  }
+  annotations:
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/healthcheck-path: /healthcheck/
+    alb.ingress.kubernetes.io/success-codes: '200'
+    alb.ingress.kubernetes.io/certificate-arn: CERTIFICATE_ARN
+    helm.sh/resource-policy: keep
   # Single domain configuration (backward compatible)
   domain: domain.com
   # Multiple domains configuration (uncomment and remove domain above to use)
@@ -34,17 +34,19 @@ ingress:
   #   - app.example.org
 
 serviceAccount:
-  name: SERVICE_ACCOUNT_NAME
+  name: secrets-csi-sa
+  annotations: { eks.amazonaws.com/role-arn: arn:aws:iam::account_id:role/role_name }
 
 apps:
   - name: app
     resources:
       requests:
-        memory: "96M"
-        cpu: "0.05"
+        memory: 96M
+        cpu: 50m
     replicaCount: 1
-    command: [ "/bin/sh", "-c" ]
-    args: [ "cd", "src", "&&", "gunicorn", "core.wsgi:application", "--bind", "0.0.0.0:8000" ]
+    # workingDir: /app/src # optional, if you want to run the commands from one specific directory without executing cd command
+    command: [ 'python' ]
+    args: [ '-m', 'src.app' ]
     externalNlb: nlb-prosperi-services
     exposePort: true
     readinessProbe:
@@ -117,14 +119,14 @@ apps:
 
 
 jobs:
-#  - name: collect-static-job
+#  - name: migration
 #    ttlSecondsAfterFinished: 10
 #    restartPolicy: Never
 #    resources:
 #      requests:
-#        memory: "96M"
-#        cpu: "0.05"
-#    args: [ "python3", "src/manage.py", "collectstatic", "--noinput" ]
+#        memory: 96M
+#        cpu: 50m
+#    command: ['aerich', 'upgrade']
 #    nodeSelector: {
 #      app_node_group: prosperi-staging
 #    }
