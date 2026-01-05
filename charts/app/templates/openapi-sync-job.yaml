@@ -73,9 +73,16 @@ spec:
               mkdir -p /tmp/tech-docs/docs/services/{{ .Values.openapiSync.serviceName }}
               cp /tmp/openapi.json /tmp/tech-docs/docs/services/{{ .Values.openapiSync.serviceName }}/openapi.json
 
+              # Create openapi.md file
+              cat > /tmp/tech-docs/docs/services/{{ .Values.openapiSync.serviceName }}/openapi.md <<'EOF'
+              # OpenAPI
+
+              <swagger-ui src="openapi.json" />
+              EOF
+
               # Commit and push
               cd /tmp/tech-docs
-              git add docs/services/{{ .Values.openapiSync.serviceName }}/openapi.json
+              git add docs/services/{{ .Values.openapiSync.serviceName }}
 
               if git diff --staged --quiet; then
                 echo "No changes to OpenAPI spec, skipping commit"
