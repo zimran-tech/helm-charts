@@ -43,8 +43,8 @@ spec:
               done
 
               # Fetch OpenAPI spec
-              echo "Fetching OpenAPI spec from http://{{ .Release.Name }}-svc.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.network.port }}/openapi.json"
-              curl -f http://{{ .Release.Name }}-svc.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.network.port }}/openapi.json > /tmp/openapi.json
+              echo "Fetching OpenAPI spec from http://{{ .Release.Name }}-svc.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.network.port }}/schema/"
+              curl -f http://{{ .Release.Name }}-svc.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.network.port }}/schema/ > /tmp/openapi.json
 
               # Validate JSON
               jq empty /tmp/openapi.json || (echo "Invalid JSON received" && exit 1)
