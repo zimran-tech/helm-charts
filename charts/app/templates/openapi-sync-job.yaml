@@ -1,0 +1,90 @@
+{{- if .Values.openapiSync.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ .Release.Name }}-openapi-sync
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ .Release.Name }}-openapi-sync
+    tenant: {{ .Values.tenant }}
+    env: {{ .Values.environment }}
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+    argocd.argoproj.io/sync-wave: "10"
+spec:
+  ttlSecondsAfterFinished: 300
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-openapi-sync
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: openapi-sync
+          image: alpine/git:latest
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              set -e
+
+              # Install curl
+              apk add --no-cache curl jq
+
+              # Wait for service to be ready (max 2 minutes)
+              echo "Waiting for {{ .Release.Name }}-svc to be ready..."
+              for i in $(seq 1 24); do
+                if curl -f -s http://{{ .Release.Name }}-svc.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.network.port }}/health/ > /dev/null 2>&1; then
+                  echo "Service is ready!"
+                  break
+                fi
+                echo "Attempt $i/24: Service not ready yet, waiting..."
+                sleep 5
+              done
+
+              # Fetch OpenAPI spec
+              echo "Fetching OpenAPI spec from http://{{ .Release.Name }}-svc.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.network.port }}/openapi.json"
+              curl -f http://{{ .Release.Name }}-svc.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.network.port }}/openapi.json > /tmp/openapi.json
+
+              # Validate JSON
+              jq empty /tmp/openapi.json || (echo "Invalid JSON received" && exit 1)
+
+              # Configure git
+              git config --global user.name "Kubernetes OpenAPI Sync"
+              git config --global user.email "noreply@k8s.local"
+
+              # Clone tech-docs repo using GitHub token
+              echo "Cloning tech-docs repository..."
+              git clone https://x-access-token:${GITHUB_TOKEN}@github.com/${TECH_DOCS_REPO}.git /tmp/tech-docs
+
+              # Create service directory and copy openapi.json
+              mkdir -p /tmp/tech-docs/docs/services/{{ .Values.openapiSync.serviceName }}
+              cp /tmp/openapi.json /tmp/tech-docs/docs/services/{{ .Values.openapiSync.serviceName }}/openapi.json
+
+              # Commit and push
+              cd /tmp/tech-docs
+              git add docs/services/{{ .Values.openapiSync.serviceName }}/openapi.json
+
+              if git diff --staged --quiet; then
+                echo "No changes to OpenAPI spec, skipping commit"
+                exit 0
+              fi
+
+              git commit -m "Update {{ .Values.openapiSync.serviceName }} OpenAPI spec
+
+              Environment: {{ .Values.environment }}
+              Triggered by: Kubernetes PostSync Hook
+              Release: {{ .Release.Name }}"
+
+              git push origin main
+
+              echo "Successfully synced OpenAPI spec to tech-docs!"
+          env:
+            - name: GITHUB_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: staging/tech-docs
+                  key: token
+            - name: TECH_DOCS_REPO
+              value: {{ .Values.openapiSync.techDocsRepo | default "coursiv-kids/tech-docs" }}
+{{- end }}

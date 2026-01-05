@@ -139,3 +139,7 @@ secrets:
     - name: RABBITMQ_URL
     - name: REDIS_URL
     - name: SENTRY_DSN
+
+openapiSync:
+  enabled: false
+  serviceName: ""
