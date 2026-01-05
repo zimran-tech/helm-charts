@@ -19,10 +19,22 @@ spec:
       labels:
         app: {{ .Release.Name }}-openapi-sync
     spec:
+      serviceAccountName: {{ .Values.serviceAccount.name }}
       restartPolicy: Never
+      volumes:
+        - name: spc-volume
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: tech-docs-spc
       containers:
         - name: openapi-sync
           image: alpine/git:latest
+          volumeMounts:
+            - name: spc-volume
+              mountPath: "/mnt/secrets-store"
+              readOnly: true
           command: ["/bin/sh", "-c"]
           args:
             - |
@@ -83,7 +95,7 @@ spec:
             - name: GITHUB_TOKEN
               valueFrom:
                 secretKeyRef:
-                  name: staging/tech-docs
+                  name: tech-docs-secret
                   key: token
             - name: TECH_DOCS_REPO
               value: {{ .Values.openapiSync.techDocsRepo | default "coursiv-kids/tech-docs" }}
