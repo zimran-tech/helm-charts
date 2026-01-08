@@ -131,6 +131,11 @@ jobs:
 #      app_node_group: prosperi-staging
 #    }
 
+sharedSecrets:
+  awsSecretName: APP/ENVIRONMENT/shared # specify shared secret name explicitly
+  envs:
+    - name: GITHUB_TOKEN
+
 secrets:
   awsSecretName: APP/ENVIRONMENT/SECRET_NAME # specify secret name explicitly
   envs:
