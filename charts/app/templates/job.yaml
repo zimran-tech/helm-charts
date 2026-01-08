@@ -69,6 +69,13 @@ spec:
               mountPath: "/mnt/secrets-store"
               readOnly: true
           env:
+            {{- range $secret := $.Values.secrets.sharedEnvs }}
+            - name: {{ $secret.name }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $.Release.Name }}-secret
+                  key: {{ $secret.name }}
+            {{- end }}
             {{- range $secret := $.Values.secrets.envs }}
             - name: {{ $secret.name }}
               valueFrom:
