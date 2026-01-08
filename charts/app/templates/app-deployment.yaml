@@ -105,7 +105,7 @@ spec:
           {{- if $app.readinessProbe }}
           readinessProbe:
             httpGet:
-              port: {{ $.Values.network.containerTargetPort }}
+              port: {{ $app.readinessProbe.httpGet.port }}
               path: {{ $app.readinessProbe.httpGet.path }}
             periodSeconds: {{ $app.readinessProbe.periodSeconds }}
             initialDelaySeconds: {{ $app.readinessProbe.initialDelaySeconds }}
@@ -113,7 +113,7 @@ spec:
           {{- if $app.livenessProbe }}
           livenessProbe:
             httpGet:
-              port: {{ $.Values.network.containerTargetPort }}
+              port: {{ $app.livenessProbe.httpGet.port }}
               path: {{ $app.livenessProbe.httpGet.path }}
             periodSeconds: {{ $app.livenessProbe.periodSeconds | default 10 }}
             initialDelaySeconds: {{ $app.livenessProbe.initialDelaySeconds | default 30 }}
