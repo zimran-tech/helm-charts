@@ -131,15 +131,13 @@ jobs:
 #      app_node_group: prosperi-staging
 #    }
 
-secrets:
-  sharedAwsSecretName: APP/ENVIRONMENT/shared # shared secret name (first source, lower priority)
-  awsSecretName: APP/ENVIRONMENT/SECRET_NAME # app-specific secret name (second source, higher priority)
-
-  # Shared environment variables (pulled from shared secret)
-  sharedEnvs:
+sharedSecrets:
+  awsSecretName: APP/ENVIRONMENT/shared # specify shared secret name explicitly
+  envs:
     - name: GITHUB_TOKEN
 
-  # App-specific environment variables (pulled from app secret, overrides shared if duplicated)
+secrets:
+  awsSecretName: APP/ENVIRONMENT/SECRET_NAME # specify secret name explicitly
   envs:
     - name: DATABASE_URL
     - name: ENVIRONMENT
