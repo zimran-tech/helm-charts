@@ -132,7 +132,14 @@ jobs:
 #    }
 
 secrets:
-  awsSecretName: APP/ENVIRONMENT/SECRET_NAME # specify secret name explicitly
+  sharedAwsSecretName: APP/ENVIRONMENT/shared # shared secret name (first source, lower priority)
+  awsSecretName: APP/ENVIRONMENT/SECRET_NAME # app-specific secret name (second source, higher priority)
+
+  # Shared environment variables (pulled from shared secret)
+  sharedEnvs:
+    - name: GITHUB_TOKEN
+
+  # App-specific environment variables (pulled from app secret, overrides shared if duplicated)
   envs:
     - name: DATABASE_URL
     - name: ENVIRONMENT
