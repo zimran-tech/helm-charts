@@ -44,6 +44,11 @@ apps:
         memory: 96M
         cpu: 50m
     replicaCount: 1
+    # metrrics configuration (optional)
+    metrics:
+      enabled: true
+      port: 8000
+      path: /metrics
     # workingDir: /app/src # optional, if you want to run the commands from one specific directory without executing cd command
     command: [ 'python' ]
     args: [ '-m', 'src.app' ]
