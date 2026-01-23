@@ -34,9 +34,17 @@ spec:
         {{- if $app.externalNlb }}
         external-nlb: {{ $app.externalNlb }}
         {{- end }}
-      {{- with $app.podAnnotations }}
+      {{- $hasMetrics := and $app.metrics $app.metrics.enabled }}
+      {{- if or $hasMetrics $app.podAnnotations }}
       annotations:
+        {{- if $hasMetrics }}
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "{{ $app.metrics.port }}"
+        prometheus.io/path: "{{ $app.metrics.path }}"
+        {{- end }}
+        {{- with $app.podAnnotations }}
         {{- toYaml . | nindent 8 }}
+        {{- end }}
       {{- end }}
     spec:
       nodeSelector:
