@@ -44,7 +44,7 @@ apps:
         memory: 96M
         cpu: 50m
     replicaCount: 1
-    # metrrics configuration (optional)
+    # metrics configuration (optional)
     metrics:
       enabled: true
       port: 8000
