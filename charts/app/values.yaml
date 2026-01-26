@@ -137,6 +137,7 @@ jobs:
 #    }
 
 sharedSecrets:
+  enabled: false # set to true if you want to use shared secrets across multiple apps
   awsSecretName: APP/ENVIRONMENT/shared # specify shared secret name explicitly
   envs:
     - name: GITHUB_TOKEN
