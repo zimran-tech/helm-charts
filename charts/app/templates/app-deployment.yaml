@@ -19,6 +19,13 @@ metadata:
     {{- end }}
 spec:
   replicas: {{ $app.replicaCount }}
+  {{- if $app.strategy }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: {{ $app.strategy.maxSurge }}
+      maxUnavailable: {{ $app.strategy.maxUnavailable }}
+  {{- end }}
   selector:
     matchLabels:
       app: {{ $.Release.Name }}-{{ $app.name }}
@@ -53,6 +60,9 @@ spec:
       {{- end }}
       {{- with $app.nodeSelector }}
           {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if $app.terminationGracePeriodSeconds }}
+      terminationGracePeriodSeconds: {{ $app.terminationGracePeriodSeconds }}
       {{- end }}
       serviceAccountName: {{ $.Values.serviceAccount.name }} # should be in the same namespace as the deployment
       volumes:
@@ -139,5 +149,11 @@ spec:
             initialDelaySeconds: {{ $app.startupProbe.initialDelaySeconds | default 0 }}
             timeoutSeconds: {{ $app.startupProbe.timeoutSeconds | default 5 }}
             failureThreshold: {{ $app.startupProbe.failureThreshold | default 30 }}
+          {{- end }}
+          {{- if $app.preStopSleep }}
+          lifecycle:
+            preStop:
+              exec:
+                command: ["sleep", "{{ $app.preStopSleep }}"]
           {{- end }}
 {{ end }}

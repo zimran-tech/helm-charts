@@ -52,6 +52,11 @@ apps:
     # workingDir: /app/src # optional, if you want to run the commands from one specific directory without executing cd command
     command: [ 'python' ]
     args: [ '-m', 'src.app' ]
+    # preStopSleep: 30 # optional, seconds to sleep before SIGTERM
+    # terminationGracePeriodSeconds: 60 # optional, grace period for pod termination
+    # strategy: # optional, rolling update strategy
+    #   maxSurge: 25%
+    #   maxUnavailable: 10%
     externalNlb: nlb-prosperi-services
     exposePort: true
     readinessProbe:
