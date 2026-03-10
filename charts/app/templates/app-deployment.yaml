@@ -123,17 +123,43 @@ spec:
             {{- end }}
           {{- if $app.readinessProbe }}
           readinessProbe:
+            {{- if $app.readinessProbe.httpGet }}
             httpGet:
-              port: {{ $.Values.network.containerTargetPort }}
+              port: {{ $app.readinessProbe.httpGet.port | default $.Values.network.containerTargetPort }}
               path: {{ $app.readinessProbe.httpGet.path }}
-            periodSeconds: {{ $app.readinessProbe.periodSeconds }}
-            initialDelaySeconds: {{ $app.readinessProbe.initialDelaySeconds }}
+            {{- else if $app.readinessProbe.exec }}
+            exec:
+              command:
+                {{- toYaml $app.readinessProbe.exec.command | nindent 16 }}
+            {{- else if $app.readinessProbe.tcpSocket }}
+            tcpSocket:
+              port: {{ $app.readinessProbe.tcpSocket.port }}
+            {{- else if $app.readinessProbe.grpc }}
+            grpc:
+              port: {{ $app.readinessProbe.grpc.port }}
+            {{- end }}
+            periodSeconds: {{ $app.readinessProbe.periodSeconds | default 10 }}
+            initialDelaySeconds: {{ $app.readinessProbe.initialDelaySeconds | default 0 }}
+            timeoutSeconds: {{ $app.readinessProbe.timeoutSeconds | default 5 }}
+            failureThreshold: {{ $app.readinessProbe.failureThreshold | default 3 }}
           {{- end }}
           {{- if $app.livenessProbe }}
           livenessProbe:
+            {{- if $app.livenessProbe.httpGet }}
             httpGet:
-              port: {{ $.Values.network.containerTargetPort }}
+              port: {{ $app.livenessProbe.httpGet.port | default $.Values.network.containerTargetPort }}
               path: {{ $app.livenessProbe.httpGet.path }}
+            {{- else if $app.livenessProbe.exec }}
+            exec:
+              command:
+                {{- toYaml $app.livenessProbe.exec.command | nindent 16 }}
+            {{- else if $app.livenessProbe.tcpSocket }}
+            tcpSocket:
+              port: {{ $app.livenessProbe.tcpSocket.port }}
+            {{- else if $app.livenessProbe.grpc }}
+            grpc:
+              port: {{ $app.livenessProbe.grpc.port }}
+            {{- end }}
             periodSeconds: {{ $app.livenessProbe.periodSeconds | default 10 }}
             initialDelaySeconds: {{ $app.livenessProbe.initialDelaySeconds | default 30 }}
             timeoutSeconds: {{ $app.livenessProbe.timeoutSeconds | default 5 }}
@@ -141,9 +167,21 @@ spec:
           {{- end }}
           {{- if $app.startupProbe }}
           startupProbe:
+            {{- if $app.startupProbe.httpGet }}
             httpGet:
-              port: {{ $.Values.network.containerTargetPort }}
+              port: {{ $app.startupProbe.httpGet.port | default $.Values.network.containerTargetPort }}
               path: {{ $app.startupProbe.httpGet.path }}
+            {{- else if $app.startupProbe.exec }}
+            exec:
+              command:
+                {{- toYaml $app.startupProbe.exec.command | nindent 16 }}
+            {{- else if $app.startupProbe.tcpSocket }}
+            tcpSocket:
+              port: {{ $app.startupProbe.tcpSocket.port }}
+            {{- else if $app.startupProbe.grpc }}
+            grpc:
+              port: {{ $app.startupProbe.grpc.port }}
+            {{- end }}
             periodSeconds: {{ $app.startupProbe.periodSeconds | default 10 }}
             initialDelaySeconds: {{ $app.startupProbe.initialDelaySeconds | default 0 }}
             timeoutSeconds: {{ $app.startupProbe.timeoutSeconds | default 5 }}

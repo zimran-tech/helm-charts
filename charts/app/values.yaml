@@ -64,6 +64,8 @@ apps:
         path: /health/
       initialDelaySeconds: 5
       periodSeconds: 5
+      timeoutSeconds: 5
+      failureThreshold: 3
     # Liveness probe configuration (optional)
     livenessProbe:
       httpGet:
