@@ -9,6 +9,15 @@ metadata:
     {{- with .Values.ingress.annotations }}
       {{- toYaml . | nindent 4 }}
     {{- end }}
+    {{- if and .Values.ingress.oidc .Values.ingress.oidc.enabled }}
+    {{- $issuer := .Values.ingress.oidc.issuer }}
+    {{- $oidcConfig := dict "Issuer" $issuer "AuthorizationEndpoint" (printf "%s/v1/authorize" $issuer) "TokenEndpoint" (printf "%s/v1/token" $issuer) "UserInfoEndpoint" (printf "%s/v1/userinfo" $issuer) "SecretName" (printf "%s-secret" .Release.Name) }}
+    alb.ingress.kubernetes.io/auth-type: oidc
+    alb.ingress.kubernetes.io/auth-idp-oidc: '{{ toJson $oidcConfig }}'
+    alb.ingress.kubernetes.io/auth-on-unauthenticated-request: {{ .Values.ingress.oidc.onUnauthenticatedRequest | default "authenticate" }}
+    alb.ingress.kubernetes.io/auth-scope: {{ .Values.ingress.oidc.scope | default "openid email profile" | quote }}
+    alb.ingress.kubernetes.io/auth-session-timeout: {{ .Values.ingress.oidc.sessionTimeout | default 28800 | quote }}
+    {{- end }}
 spec:
   ingressClassName: {{ .Values.ingress.class }}
   rules:

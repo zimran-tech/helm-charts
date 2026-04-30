@@ -33,6 +33,27 @@ ingress:
   #   - api.example.com
   #   - app.example.org
 
+  # ALB OIDC authentication (AWS Load Balancer Controller)
+  # When enabled, ALB will require users to authenticate with the configured
+  # OIDC provider (e.g., Okta) before forwarding requests to the application.
+  # Requires:
+  #   - AWS Load Balancer Controller in the cluster
+  #   - AWS Secrets Manager secret with `clientID` and `clientSecret` JSON keys
+  #   - OIDC application registered in the IdP with redirect URI:
+  #     https://<your-domain>/oauth2/idpresponse
+  oidc:
+    enabled: false
+    # AWS Secrets Manager secret name (must contain `clientID` and `clientSecret`)
+    awsSecretName: APP/ENVIRONMENT/oidc
+    # OIDC issuer URL (e.g., https://your-tenant.okta.com/oauth2/default)
+    issuer: ""
+    # OAuth scope to request from the IdP
+    scope: openid email profile
+    # ALB session cookie timeout in seconds (default: 8 hours)
+    sessionTimeout: 28800
+    # Behavior when request is not authenticated: authenticate | allow | deny
+    onUnauthenticatedRequest: authenticate
+
 serviceAccount:
   name: secrets-csi-sa
   annotations: { eks.amazonaws.com/role-arn: arn:aws:iam::account_id:role/role_name }
