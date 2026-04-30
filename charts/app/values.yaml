@@ -46,8 +46,9 @@ ingress:
   #     https://<your-domain>/oauth2/idpresponse
   oidc:
     enabled: false
-    # OIDC issuer URL
-    issuer: https://zimran.okta.com/oauth2/default
+    # OIDC issuer URL — Coursiv's Okta tenant (Org Authorization Server).
+    # Endpoints are at <issuer>/oauth2/v1/{authorize,token,userinfo}.
+    issuer: https://zimran.okta.com
 
 serviceAccount:
   name: secrets-csi-sa

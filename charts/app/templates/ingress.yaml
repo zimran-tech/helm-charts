@@ -12,8 +12,8 @@ metadata:
     {{- if .Values.ingress.oidc.enabled }}
     {{- $issuer := .Values.ingress.oidc.issuer }}
     alb.ingress.kubernetes.io/auth-type: oidc
-    # IdP config: OIDC endpoints + name of the k8s Secret with clientID/clientSecret
-    alb.ingress.kubernetes.io/auth-idp-oidc: '{"Issuer":"{{ $issuer }}","AuthorizationEndpoint":"{{ $issuer }}/v1/authorize","TokenEndpoint":"{{ $issuer }}/v1/token","UserInfoEndpoint":"{{ $issuer }}/v1/userinfo","SecretName":"{{ .Release.Name }}-secret"}'
+    # IdP config: OIDC endpoints (Okta Org AS layout) + name of the k8s Secret with clientID/clientSecret
+    alb.ingress.kubernetes.io/auth-idp-oidc: '{"Issuer":"{{ $issuer }}","AuthorizationEndpoint":"{{ $issuer }}/oauth2/v1/authorize","TokenEndpoint":"{{ $issuer }}/oauth2/v1/token","UserInfoEndpoint":"{{ $issuer }}/oauth2/v1/userinfo","SecretName":"{{ .Release.Name }}-secret"}'
     # Redirect to OIDC login on missing/expired session (alternatives: deny, allow)
     alb.ingress.kubernetes.io/auth-on-unauthenticated-request: authenticate
     # Identity claims requested from IdP (no `groups` — ALB doesn't enforce them)

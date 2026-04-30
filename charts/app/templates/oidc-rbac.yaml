@@ -1,0 +1,37 @@
+{{- if .Values.ingress.oidc.enabled }}
+{{/*
+Allows AWS Load Balancer Controller to read this release's k8s Secret
+(<Release.Name>-secret) to configure OIDC on ALB. Without this, the controller
+gets `secrets is forbidden` and silently leaves the ALB without OIDC auth.
+
+Scoped to the single Secret managed by this chart (no broader access).
+*/}}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ .Release.Name }}-aws-lbc-secret-reader
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    resourceNames: ["{{ .Release.Name }}-secret"]
+    verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ .Release.Name }}-aws-lbc-secret-reader
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+subjects:
+  - kind: ServiceAccount
+    name: aws-load-balancer-controller
+    namespace: kube-system
+roleRef:
+  kind: Role
+  name: {{ .Release.Name }}-aws-lbc-secret-reader
+  apiGroup: rbac.authorization.k8s.io
+{{- end }}
