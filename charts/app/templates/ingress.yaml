@@ -9,14 +9,16 @@ metadata:
     {{- with .Values.ingress.annotations }}
       {{- toYaml . | nindent 4 }}
     {{- end }}
-    {{- if and .Values.ingress.oidc .Values.ingress.oidc.enabled }}
+    {{- if .Values.ingress.oidc.enabled }}
     {{- $issuer := .Values.ingress.oidc.issuer }}
-    {{- $oidcConfig := dict "Issuer" $issuer "AuthorizationEndpoint" (printf "%s/v1/authorize" $issuer) "TokenEndpoint" (printf "%s/v1/token" $issuer) "UserInfoEndpoint" (printf "%s/v1/userinfo" $issuer) "SecretName" (printf "%s-secret" .Release.Name) }}
     alb.ingress.kubernetes.io/auth-type: oidc
-    alb.ingress.kubernetes.io/auth-idp-oidc: '{{ toJson $oidcConfig }}'
-    alb.ingress.kubernetes.io/auth-on-unauthenticated-request: {{ .Values.ingress.oidc.onUnauthenticatedRequest | default "authenticate" }}
-    alb.ingress.kubernetes.io/auth-scope: {{ .Values.ingress.oidc.scope | default "openid email profile" | quote }}
-    alb.ingress.kubernetes.io/auth-session-timeout: {{ .Values.ingress.oidc.sessionTimeout | default 28800 | quote }}
+    # IdP config: OIDC endpoints + name of the k8s Secret with clientID/clientSecret
+    alb.ingress.kubernetes.io/auth-idp-oidc: '{"Issuer":"{{ $issuer }}","AuthorizationEndpoint":"{{ $issuer }}/v1/authorize","TokenEndpoint":"{{ $issuer }}/v1/token","UserInfoEndpoint":"{{ $issuer }}/v1/userinfo","SecretName":"{{ .Release.Name }}-secret"}'
+    # Redirect to OIDC login on missing/expired session (alternatives: deny, allow)
+    alb.ingress.kubernetes.io/auth-on-unauthenticated-request: authenticate
+    # Identity claims requested from IdP (no `groups` — ALB doesn't enforce them)
+    alb.ingress.kubernetes.io/auth-scope: openid email profile
+    alb.ingress.kubernetes.io/auth-session-timeout: "28800"  # 8 hours
     {{- end }}
 spec:
   ingressClassName: {{ .Values.ingress.class }}
