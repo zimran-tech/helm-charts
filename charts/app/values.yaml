@@ -33,6 +33,22 @@ ingress:
   #   - api.example.com
   #   - app.example.org
 
+  # ALB OIDC authentication (AWS Load Balancer Controller + Okta)
+  # When enabled, ALB requires users to authenticate with the OIDC issuer
+  # below before forwarding requests to the application.
+  # Requires:
+  #   - `clientID` and `clientSecret` keys in the AWS Secrets Manager secret
+  #     referenced by `secrets.awsSecretName` above, AND added to `secrets.envs`:
+  #         envs:
+  #           - name: clientID
+  #           - name: clientSecret
+  #   - Okta OIDC application with redirect URI:
+  #     https://<your-domain>/oauth2/idpresponse
+  oidc:
+    enabled: false
+    # OIDC issuer URL
+    issuer: https://zimran.okta.com/oauth2/default
+
 serviceAccount:
   name: secrets-csi-sa
   annotations: { eks.amazonaws.com/role-arn: arn:aws:iam::account_id:role/role_name }
