@@ -14,6 +14,16 @@ entries:
   app:
   - apiVersion: v2
     appVersion: 1.0.0
+    created: "2026-04-30T09:34:08.138969802Z"
+    description: A Helm chart for Prosperi Applications
+    digest: c95c10531c78aa159d4b94b6230a62a3a524edbdbd75d2b06f002dedb5ee407d
+    name: app
+    type: application
+    urls:
+    - https://github.com/zimran-tech/helm-charts/releases/download/app-2.11.0/app-2.11.0.tgz
+    version: 2.11.0
+  - apiVersion: v2
+    appVersion: 1.0.0
     created: "2026-03-10T06:54:11.750967068Z"
     description: A Helm chart for Prosperi Applications
     digest: f34511b0b2b7e9af4e081e65816914f820cc85818a148b7c5aa722c116ffee09
@@ -372,4 +382,4 @@ entries:
     urls:
     - https://github.com/zimran-tech/helm-charts/releases/download/app-0.1.0/app-0.1.0.tgz
     version: 0.1.0
-generated: "2026-03-10T06:54:11.751405092Z"
+generated: "2026-04-30T09:34:08.1392418Z"
