@@ -9,6 +9,17 @@ metadata:
     {{- with .Values.ingress.annotations }}
       {{- toYaml . | nindent 4 }}
     {{- end }}
+    {{- if .Values.ingress.oidc.enabled }}
+    {{- $issuer := .Values.ingress.oidc.issuer }}
+    alb.ingress.kubernetes.io/auth-type: oidc
+    # IdP config: OIDC endpoints + name of the k8s Secret with clientID/clientSecret
+    alb.ingress.kubernetes.io/auth-idp-oidc: '{"Issuer":"{{ $issuer }}","AuthorizationEndpoint":"{{ $issuer }}/v1/authorize","TokenEndpoint":"{{ $issuer }}/v1/token","UserInfoEndpoint":"{{ $issuer }}/v1/userinfo","SecretName":"{{ .Release.Name }}-secret"}'
+    # Redirect to OIDC login on missing/expired session (alternatives: deny, allow)
+    alb.ingress.kubernetes.io/auth-on-unauthenticated-request: authenticate
+    # Identity claims requested from IdP (no `groups` — ALB doesn't enforce them)
+    alb.ingress.kubernetes.io/auth-scope: openid email profile
+    alb.ingress.kubernetes.io/auth-session-timeout: "28800"  # 8 hours
+    {{- end }}
 spec:
   ingressClassName: {{ .Values.ingress.class }}
   rules:
