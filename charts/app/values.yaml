@@ -13,6 +13,7 @@ network:
   port: 2000
   containerTargetPort: 8000
   serviceEnabled: false
+  annotations: {}
 
 ingress:
   enabled: false
