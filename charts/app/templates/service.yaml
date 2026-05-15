@@ -6,7 +6,21 @@ metadata:
   namespace: {{ .Release.Namespace }}
   annotations:
     argocd.argoproj.io/sync-wave: "1"
+    {{- with .Values.network.annotations }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
 spec:
+  type: {{ .Values.network.type | default "ClusterIP" }}
+  {{- with .Values.network.loadBalancerClass }}
+  loadBalancerClass: {{ . }}
+  {{- end }}
+  {{- with .Values.network.loadBalancerSourceRanges }}
+  loadBalancerSourceRanges:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.network.externalTrafficPolicy }}
+  externalTrafficPolicy: {{ . }}
+  {{- end }}
   selector:
     app: {{ .Release.Name }}-app
     env: {{ .Values.environment }}
