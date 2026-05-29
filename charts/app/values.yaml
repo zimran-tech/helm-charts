@@ -52,8 +52,18 @@ ingress:
     issuer: https://zimran.okta.com
 
 serviceAccount:
+  # Set create: true to have the chart render the ServiceAccount object.
+  # Default false preserves prior behaviour where the SA was managed externally
+  # (Terraform module for cluster-infra SAs, or pre-existing in the cluster).
+  create: false
   name: secrets-csi-sa
-  annotations: { eks.amazonaws.com/role-arn: arn:aws:iam::account_id:role/role_name }
+  annotations: {}
+  rbac:
+    # Set rbac.create: true to render a RoleBinding (namespace-scoped) that
+    # binds the SA to an existing ClusterRole. Default false.
+    create: false
+    # ClusterRole to reference in the RoleBinding (e.g. built-in "view").
+    roleRef: view
 
 apps:
   - name: app
