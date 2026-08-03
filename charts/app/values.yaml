@@ -38,6 +38,13 @@ apps:
     replicaCount: 1
     command: [ "/bin/sh", "-c" ]
     args: [ "cd", "src", "&&", "gunicorn", "core.wsgi:application", "--bind", "0.0.0.0:8000" ]
+    # preStopSleep: 30 # optional, seconds to sleep before SIGTERM
+    # terminationGracePeriodSeconds: 60 # optional, grace period for pod termination
+    # strategy: # optional, deployment strategy in raw Kubernetes shape (toYaml passthrough)
+    #   type: RollingUpdate
+    #   rollingUpdate:
+    #     maxSurge: 1
+    #     maxUnavailable: 0
     externalNlb: nlb-prosperi-services
     exposePort: true
     readinessProbe:
