@@ -5,6 +5,17 @@ Allows AWS Load Balancer Controller to read this release's k8s Secret
 gets `secrets is forbidden` and silently leaves the ALB without OIDC auth.
 
 Scoped to the single Secret managed by this chart (no broader access).
+
+get/list/watch are all required: the controller reads the Secret through a
+watch-based informer, not a one-off get. A Role with only "get" satisfies the
+initial read but the informer's list/watch is denied, so the controller cannot
+observe the Secret and never pushes the OIDC config to the ALB — the same
+silent failure this Role exists to prevent.
+
+Note that resourceNames does NOT restrict list/watch: those verbs act on the
+collection, so they are granted namespace-wide for Secrets. That is inherent
+to Kubernetes RBAC, and why this Role is per-release in the app's own
+namespace rather than a cluster-wide grant.
 */}}
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
@@ -17,7 +28,7 @@ rules:
   - apiGroups: [""]
     resources: ["secrets"]
     resourceNames: ["{{ .Release.Name }}-secret"]
-    verbs: ["get"]
+    verbs: ["get", "list", "watch"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
