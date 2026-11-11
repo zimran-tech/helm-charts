@@ -54,6 +54,7 @@ ingress:
 serviceAccount:
   name: secrets-csi-sa
   annotations: { eks.amazonaws.com/role-arn: arn:aws:iam::account_id:role/role_name }
+  projectedTokens: []
 
 apps:
   - name: app

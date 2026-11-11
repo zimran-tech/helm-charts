@@ -1,2 +1,17 @@
 .idea
 .DS_Store
+
+# Local secret-bearing files
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.pem
+*.key
+*.p12
+*.pfx
+credentials.json
+credentials.*.json
+!credentials.example.json
+!credentials.*.example.json
+secrets.local.*
