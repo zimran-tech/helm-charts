@@ -71,6 +71,22 @@ spec:
             readOnly: true
             volumeAttributes:
               secretProviderClass: {{ $.Release.Name }}-spc
+        {{- range $volume := $.Values.volumes }}
+        {{- if $volume.files }}
+        - name: {{ $volume.name }}
+          configMap:
+            name: {{ $.Release.Name }}-{{ $volume.name }}
+        {{- end }}
+        {{- end }}
+        {{- range $token := $.Values.serviceAccount.projectedTokens }}
+        - name: {{ $token.name }}-token
+          projected:
+            sources:
+              - serviceAccountToken:
+                  path: token
+                  audience: {{ $token.audience | quote }}
+                  expirationSeconds: {{ $token.expirationSeconds | default 3600 }}
+        {{- end }}
       containers:
         - name: {{ $.Release.Name }}-{{ $app.name }}
           image: "{{ $.Values.image.repository }}:{{ $.Values.image.tag }}"
@@ -104,6 +120,18 @@ spec:
             - name: spc-volume
               mountPath: "/mnt/secrets-store"
               readOnly: true
+            {{- range $volume := $.Values.volumes }}
+            {{- if $volume.files }}
+            - name: {{ $volume.name }}
+              mountPath: {{ $volume.mountPath | quote }}
+              readOnly: true
+            {{- end }}
+            {{- end }}
+            {{- range $token := $.Values.serviceAccount.projectedTokens }}
+            - name: {{ $token.name }}-token
+              mountPath: "/var/run/secrets/tokens/{{ $token.name }}"
+              readOnly: true
+            {{- end }}
           env:
             {{- if $.Values.sharedSecrets.enabled }}
             {{- range $secret := $.Values.sharedSecrets.envs }}

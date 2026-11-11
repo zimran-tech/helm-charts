@@ -54,6 +54,19 @@ ingress:
 serviceAccount:
   name: secrets-csi-sa
   annotations: { eks.amazonaws.com/role-arn: arn:aws:iam::account_id:role/role_name }
+  # mounted at /var/run/secrets/tokens/<name>/token
+  projectedTokens: []
+  # - name: gcp
+  #   audience: https://iam.googleapis.com/projects/<N>/.../providers/<PROVIDER>
+  #   expirationSeconds: 3600
+
+# rendered into a ConfigMap, mounted read-only into every app container
+volumes: []
+# - name: gcp-config
+#   mountPath: /etc/gcp
+#   files:
+#     credential-config.json: |
+#       { "type": "external_account", ... }
 
 apps:
   - name: app
