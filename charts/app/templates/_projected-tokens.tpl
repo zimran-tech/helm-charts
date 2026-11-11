@@ -9,7 +9,7 @@
       - serviceAccountToken:
           path: token
           audience: {{ required (printf "serviceAccount.projectedTokens[%s].audience is required" $token.name) $token.audience | quote }}
-          expirationSeconds: {{ $token.expirationSeconds | default 3600 }}
+          expirationSeconds: {{ $token.expirationSeconds | default 3600 | int64 }}
 {{- end }}
 {{- end -}}
 
