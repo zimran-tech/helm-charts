@@ -55,6 +55,10 @@ serviceAccount:
   name: secrets-csi-sa
   annotations: { eks.amazonaws.com/role-arn: arn:aws:iam::account_id:role/role_name }
   projectedTokens: []
+  # true when the ServiceAccount gets its AWS role from an EKS Pod Identity association
+  # instead of the role-arn annotation (IRSA): the Secrets Store CSI provider then
+  # authenticates with Pod Identity too.
+  podIdentity: false
 
 apps:
   - name: app
