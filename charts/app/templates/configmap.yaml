@@ -1,0 +1,15 @@
+{{- range $volume := .Values.volumes }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $.Release.Name }}-{{ required "volumes[].name is required" $volume.name }}
+  namespace: {{ $.Release.Namespace }}
+  labels:
+    app: {{ $.Release.Name }}
+    env: {{ $.Values.environment }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "-2"
+data:
+  {{- toYaml (required (printf "volumes[%s].files is required" $volume.name) $volume.files) | nindent 2 }}
+{{- end }}

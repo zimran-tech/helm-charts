@@ -56,6 +56,19 @@ serviceAccount:
   annotations: { eks.amazonaws.com/role-arn: arn:aws:iam::account_id:role/role_name }
   projectedTokens: []
 
+# Non-secret files: each volume becomes a ConfigMap mounted read-only at mountPath.
+volumes: []
+# - name: gcp-config
+#   mountPath: /etc/gcp
+#   files:
+#     credential-config.json: |
+#       { "type": "external_account", ... }
+
+# Plain (non-secret) environment variables, set after the secret-backed ones.
+env: []
+# - name: GOOGLE_APPLICATION_CREDENTIALS
+#   value: /etc/gcp/credential-config.json
+
 apps:
   - name: app
     resources:

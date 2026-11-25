@@ -45,6 +45,7 @@ spec:
             volumeAttributes:
               secretProviderClass: {{ $.Release.Name }}-spc
 {{- with (include "app.projectedTokenVolumes" $ | trim) }}{{ . | nindent 8 }}{{- end }}
+{{- with (include "app.fileVolumes" $ | trim) }}{{ . | nindent 8 }}{{- end }}
       containers:
         - name: {{ $.Release.Name }}-{{ $job.name }}
           image: "{{ $.Values.image.repository }}:{{ $.Values.image.tag }}"
@@ -69,6 +70,7 @@ spec:
               mountPath: "/mnt/secrets-store"
               readOnly: true
 {{- with (include "app.projectedTokenMounts" $ | trim) }}{{ . | nindent 12 }}{{- end }}
+{{- with (include "app.fileVolumeMounts" $ | trim) }}{{ . | nindent 12 }}{{- end }}
           env:
             {{- if $.Values.sharedSecrets.enabled }}
             {{- range $secret := $.Values.sharedSecrets.envs }}
@@ -86,4 +88,5 @@ spec:
                   name: {{ $.Release.Name }}-secret
                   key: {{ $secret.name }}
             {{- end }}
+{{- with (include "app.plainEnv" $ | trim) }}{{ . | nindent 12 }}{{- end }}
 {{- end }}
