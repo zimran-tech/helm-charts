@@ -41,8 +41,11 @@ spec:
         external-nlb: {{ $app.externalNlb }}
         {{- end }}
       {{- $hasMetrics := and $app.metrics $app.metrics.enabled }}
-      {{- if or $hasMetrics $app.podAnnotations }}
+      {{- if or $hasMetrics $app.podAnnotations $.Values.volumes }}
       annotations:
+        {{- if $.Values.volumes }}
+        checksum/volumes: {{ $.Values.volumes | toJson | sha256sum }}
+        {{- end }}
         {{- if $hasMetrics }}
         prometheus.io/scrape: "true"
         prometheus.io/port: "{{ $app.metrics.port }}"
@@ -72,6 +75,7 @@ spec:
             volumeAttributes:
               secretProviderClass: {{ $.Release.Name }}-spc
 {{- with (include "app.projectedTokenVolumes" $ | trim) }}{{ . | nindent 8 }}{{- end }}
+{{- with (include "app.fileVolumes" $ | trim) }}{{ . | nindent 8 }}{{- end }}
       containers:
         - name: {{ $.Release.Name }}-{{ $app.name }}
           image: "{{ $.Values.image.repository }}:{{ $.Values.image.tag }}"
@@ -106,6 +110,7 @@ spec:
               mountPath: "/mnt/secrets-store"
               readOnly: true
 {{- with (include "app.projectedTokenMounts" $ | trim) }}{{ . | nindent 12 }}{{- end }}
+{{- with (include "app.fileVolumeMounts" $ | trim) }}{{ . | nindent 12 }}{{- end }}
           env:
             {{- if $.Values.sharedSecrets.enabled }}
             {{- range $secret := $.Values.sharedSecrets.envs }}
@@ -123,6 +128,7 @@ spec:
                   name: {{ $.Release.Name }}-secret
                   key: {{ $secret.name }}
             {{- end }}
+{{- with (include "app.plainEnv" $ | trim) }}{{ . | nindent 12 }}{{- end }}
           {{- if $app.readinessProbe }}
           readinessProbe:
             {{- if $app.readinessProbe.httpGet }}
